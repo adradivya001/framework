@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     thread_id   UUID REFERENCES conversation_threads(id) ON DELETE SET NULL,
     actor_id    TEXT NOT NULL,
+    actor_type  TEXT NOT NULL,                 -- HUMAN | AI | SYSTEM
     action      TEXT NOT NULL,
     payload     JSONB NOT NULL DEFAULT '{}',
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
