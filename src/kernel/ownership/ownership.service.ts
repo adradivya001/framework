@@ -3,7 +3,7 @@ import { OwnershipType, Thread } from '../../types';
 import { ThreadService } from '../thread/thread.service';
 import { AuditService } from '../audit/audit.service';
 import { ThreadRepository } from '../../infrastructure/repositories/thread.repository';
-import type { DomainNotifier } from '../../contracts';
+import { ProviderRegistry } from '../services/provider-registry.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { ConcurrencyException } from '../../infrastructure/exceptions';
 
@@ -16,7 +16,7 @@ export class OwnershipService {
         private readonly auditService: AuditService,
         private readonly threadRepository: ThreadRepository,
         private readonly metricsService: MetricsService,
-        @Inject('DOMAIN_NOTIFIER') private readonly domainNotifier: DomainNotifier,
+        private readonly providerRegistry: ProviderRegistry,
     ) { }
 
     async switchOwnership(
@@ -51,7 +51,11 @@ export class OwnershipService {
             });
 
             this.metricsService.incrementOwnershipSwitchCount(threadId, thread.ownership, ownershipType);
-            await this.domainNotifier.notifyOwnershipSwitch(updatedThread, actorId);
+
+            const plugins = this.providerRegistry.getPlugins(thread.domain);
+            if (plugins?.domainNotifier) {
+                await plugins.domainNotifier.notifyOwnershipSwitch(updatedThread, actorId);
+            }
 
             return updatedThread;
         } catch (error) {

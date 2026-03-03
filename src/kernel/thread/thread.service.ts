@@ -67,6 +67,7 @@ export class ThreadService {
         sender_id: string;
         sender_type: 'USER' | 'AI' | 'HUMAN';
         content: string;
+        domain?: string;
     }): Promise<Message> {
         // If AI is sending the message, enforce suppression
         if (dto.sender_type === 'AI') {

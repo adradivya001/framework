@@ -1,32 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseModule } from './infrastructure/database.module';
-import { QueueModule } from './infrastructure/queue.module';
+import { TerminusModule } from '@nestjs/terminus';
 import { KernelModule } from './kernel/kernel.module';
 import { ThreadController } from './api/thread.controller';
+import { HealthController } from './api/health.controller';
+import { DatabaseModule } from './infrastructure/database.module';
+import { QueueModule } from './infrastructure/queue.module';
 import configuration from './config/configuration';
-
-// Mock Plugin Implementations (Domain Layer)
-const mockSentimentProvider = {
-  evaluate: async (text: string) => ({
-    score: text.includes('help') ? 0.2 : 0.8,
-    label: text.includes('help') ? 'red' : 'green'
-  }),
-};
-
-const mockEscalationPolicy = {
-  shouldEscalate: async () => true,
-  getRequiredRole: () => 'SUPPORT_AGENT',
-};
-
-const mockDomainNotifier = {
-  notifyOwnershipSwitch: async (thread: any, actorId: string) => {
-    console.log(`[Domain] Thread ${thread.id} ownership switched by ${actorId}`);
-  },
-  notifyStatusChange: async (thread: any, prev: string) => {
-    console.log(`[Domain] Thread ${thread.id} status changed from ${prev} to ${thread.status}`);
-  },
-};
 
 @Module({
   imports: [
@@ -35,15 +15,25 @@ const mockDomainNotifier = {
       load: [configuration],
       envFilePath: ['.env/development.env'],
     }),
+    TerminusModule,
     DatabaseModule,
     QueueModule,
+    // Register a 'test' domain to verify the framework is working
     KernelModule.register({
-      sentimentProvider: mockSentimentProvider,
-      escalationPolicy: mockEscalationPolicy,
-      domainNotifier: mockDomainNotifier,
+      sentimentProvider: {
+        evaluate: async (text: string) => ({ score: 0.5, label: 'neutral' })
+      },
+      escalationPolicy: {
+        shouldEscalate: async () => false,
+        getRequiredRole: () => 'AGENT'
+      },
+      domainNotifier: {
+        notifyOwnershipSwitch: async () => { },
+        notifyStatusChange: async () => { }
+      }
     }),
   ],
-  controllers: [ThreadController],
+  controllers: [ThreadController, HealthController],
   providers: [],
 })
 export class AppModule { }

@@ -1,0 +1,35 @@
+# Integration test override — runs the full test suite inside a Linux container.
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit
+#
+# This resolves the Windows Error -1073741510 (STATUS_CONTROL_C_EXIT) caused by BullMQ/ioredis
+# native module conflicts on Windows. Running tests inside Linux Docker is the authoritative
+# test environment.
+
+services:
+  app:
+    build:
+      context: .
+      target: dependencies # Uses the dependencies stage (has node_modules)
+    volumes:
+      - ./src:/app/src:ro
+      - ./test:/app/test:ro
+      - ./db:/app/db:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - ./tsconfig.build.json:/app/tsconfig.build.json:ro
+      - ./nest-cli.json:/app/nest-cli.json:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - NODE_ENV=test
+      - SUPABASE_URL=https://dummy.supabase.co
+      - SUPABASE_KEY=dummy-key
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    command: [ "npx", "jest", "--config", "./test/jest-integration.json", "--forceExit", "--runInBand", "--verbose" ]
+    depends_on:
+      redis:
+        condition: service_healthy
+    # Note: Postgres is managed by TestContainers inside the container via Docker socket
+
+networks:
+  control-tower-net:
+    driver: bridge

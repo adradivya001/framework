@@ -7,6 +7,8 @@ import { OwnershipService } from '../ownership/ownership.service';
 import type { EscalationPolicy } from '../../contracts';
 import { RoutingRepository, RoutingStatus } from '../../infrastructure/repositories/routing.repository';
 import { MetricsService } from '../metrics/metrics.service';
+import { ProviderRegistry } from '../services/provider-registry.service';
+import { ThreadService } from '../thread/thread.service';
 
 
 @Injectable()
@@ -16,25 +18,27 @@ export class RoutingService implements OnModuleInit {
     constructor(
         @InjectQueue('routing_queue') private readonly routingQueue: Queue,
         private readonly ownershipService: OwnershipService,
-        @Inject('ESCALATION_POLICY') private readonly escalationPolicy: EscalationPolicy,
+        private readonly providerRegistry: ProviderRegistry,
+        private readonly threadService: ThreadService,
         private readonly routingRepository: RoutingRepository,
         private readonly metricsService: MetricsService,
         private readonly configService: ConfigService,
     ) { }
 
     async onModuleInit() {
-        const staleTimeout = this.configService.get<number>('hardening.routingStaleTimeout') || 600000;
-        this.logger.log(`Starting stale routing recovery scan (timeout: ${staleTimeout}ms)...`);
-
-        const staleJobs = await this.routingRepository.findStaleAssigned(staleTimeout);
-        for (const job of staleJobs) {
-            this.logger.warn(`Recovering stale routing job ${job.id} for thread ${job.thread_id}`);
-            await this.enqueueRoutingJob(job.id, job.thread_id, job.required_role);
-        }
+        // Disabling startup scan to investigate crash
+        this.logger.log('RoutingService: Startup scan disabled for stability.');
     }
 
     async routeToHuman(threadId: string, actorId: string): Promise<void> {
-        const requiredRole = await this.escalationPolicy.getRequiredRole({ id: threadId } as any);
+        const thread = await this.threadService.getThread(threadId);
+        const plugins = this.providerRegistry.getPlugins(thread.domain);
+
+        if (!plugins) {
+            throw new Error(`Orchestration: No plugins found for domain [${thread.domain}]`);
+        }
+
+        const requiredRole = await plugins.escalationPolicy.getRequiredRole(thread);
 
         // 1. Idempotent Update/Create routing_queue
         const { entry, isNew } = await this.routingRepository.createIdempotent({

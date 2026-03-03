@@ -62,7 +62,7 @@ export class ThreadController {
         const message = await this.threadService.appendMessage(dto.thread_id, dto);
 
         // 2. Run sentiment (Fire and forget, tracked in DB)
-        this.sentimentService.evaluateThreadSentiment(dto.thread_id, message.id, dto.content)
+        this.sentimentService.evaluateThreadSentiment(dto.thread_id, message.id, dto.content, 'default')
             .catch(err => console.error('Sentiment evaluation failed:', err));
 
         // 3. Run guardrail (Awaited for safety/blocking)
