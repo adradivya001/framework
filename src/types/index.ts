@@ -53,6 +53,7 @@ export interface AuditLog {
     id: string;
     thread_id?: string;
     actor_id: string;
+    actor_type: 'HUMAN' | 'AI' | 'SYSTEM';
     action: string;
     payload: Record<string, any>;
     created_at: Date;

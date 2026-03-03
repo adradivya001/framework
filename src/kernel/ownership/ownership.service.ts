@@ -23,6 +23,7 @@ export class OwnershipService {
         threadId: string,
         ownershipType: OwnershipType,
         actorId: string,
+        actorType: 'HUMAN' | 'AI' | 'SYSTEM',
         options: { assignedRole?: string; assignedUserId?: string } = {},
     ): Promise<Thread> {
         const thread = await this.threadService.getThread(threadId);
@@ -36,12 +37,14 @@ export class OwnershipService {
                 ownership: ownershipType,
                 assigned_role: options.assignedRole,
                 assigned_user_id: options.assignedUserId,
-                is_locked: false, // Reset lock on ownership change
+                // MANDATE: When a thread is in HUMAN ownership, you must enforce is_locked = true.
+                is_locked: ownershipType === OwnershipType.HUMAN ? true : false,
             });
 
             await this.auditService.append({
                 thread_id: threadId,
                 actor_id: actorId,
+                actor_type: actorType,
                 action: 'OWNERSHIP_SWITCHED',
                 payload: {
                     previous_ownership: thread.ownership,
@@ -66,7 +69,7 @@ export class OwnershipService {
         }
     }
 
-    async toggleLock(threadId: string, isLocked: boolean, actorId: string): Promise<Thread> {
+    async toggleLock(threadId: string, isLocked: boolean, actorId: string, actorType: 'HUMAN' | 'AI' | 'SYSTEM'): Promise<Thread> {
         const thread = await this.threadService.getThread(threadId);
 
         try {
@@ -77,6 +80,7 @@ export class OwnershipService {
             await this.auditService.append({
                 thread_id: threadId,
                 actor_id: actorId,
+                actor_type: actorType,
                 action: isLocked ? 'THREAD_LOCKED' : 'THREAD_UNLOCKED',
                 payload: { previous_version: thread.version },
             });

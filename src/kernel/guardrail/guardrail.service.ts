@@ -37,6 +37,7 @@ export class GuardrailService {
             await this.auditService.append({
                 thread_id: threadId,
                 actor_id: 'GUARDRAIL_ENGINE',
+                actor_type: 'SYSTEM',
                 action: 'GUARDRAIL_TRIGGERED',
                 payload: { triggeredRule },
             });

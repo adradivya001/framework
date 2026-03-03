@@ -38,6 +38,7 @@ export class ThreadService {
         await this.auditService.append({
             thread_id: thread.id,
             actor_id: 'SYSTEM',
+            actor_type: 'SYSTEM',
             action: 'THREAD_INITIALIZED',
             payload: { domain: dto.domain, user_id: dto.user_id },
         });
@@ -84,6 +85,7 @@ export class ThreadService {
         await this.auditService.append({
             thread_id: threadId,
             actor_id: dto.sender_id,
+            actor_type: dto.sender_type as any, // USER, AI, HUMAN match
             action: 'MESSAGE_APPENDED',
             payload: { sender_type: dto.sender_type, content_length: dto.content.length },
         });
@@ -102,6 +104,7 @@ export class ThreadService {
             await this.auditService.append({
                 thread_id: id,
                 actor_id: 'SYSTEM',
+                actor_type: 'SYSTEM',
                 action: 'STATUS_UPDATED',
                 payload: { status, previous_version: version },
             });

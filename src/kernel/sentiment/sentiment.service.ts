@@ -36,23 +36,13 @@ export class SentimentService {
 
         const thread = await this.threadService.getThread(threadId);
 
-        // If red, trigger status update and potentially routing
+        // If red, trigger status update and MANDATORY escalation
         if (evaluation.label === 'red') {
             await this.threadService.updateThreadStatusWithVersionCheck(threadId, ThreadStatus.RED, thread.version);
 
-            const sentimentEval: SentimentEvaluation = {
-                ...evaluation,
-                thread_id: threadId,
-                message_id: messageId,
-                id: '',
-                provider: `DOMAIN_SPECIFIC_${domain.toUpperCase()}`,
-                created_at: new Date(),
-            };
-
-            const shouldEscalate = await plugins.escalationPolicy.shouldEscalate(thread, sentimentEval);
-            if (shouldEscalate) {
-                await this.routingService.routeToHuman(threadId, 'SENTIMENT_ENGINE');
-            }
+            // MANDATE: Automatically invoke routeToHuman() and switchOwnership without exception.
+            this.logger.log(`SentimentEngine: Red sentiment detected for thread ${threadId}. Triggering mandatory escalation.`);
+            await this.routingService.routeToHuman(threadId, 'SENTIMENT_ENGINE');
         }
     }
 }

@@ -57,7 +57,7 @@ export class RoutingService implements OnModuleInit {
         this.metricsService.incrementEscalationCount(threadId);
 
         // 3. Switch ownership to HUMAN
-        await this.ownershipService.switchOwnership(threadId, OwnershipType.HUMAN, actorId, {
+        await this.ownershipService.switchOwnership(threadId, OwnershipType.HUMAN, actorId, 'SYSTEM', {
             assignedRole: requiredRole,
         });
     }

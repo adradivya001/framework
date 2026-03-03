@@ -52,12 +52,17 @@ describe('OwnershipService', () => {
         service = module.get<OwnershipService>(OwnershipService);
     });
 
-    it('should switch ownership from AI to HUMAN', async () => {
-        const result = await service.switchOwnership('thread-1', OwnershipType.HUMAN, 'agent-1');
+    it('should switch ownership from AI to HUMAN and lock the thread', async () => {
+        const result = await service.switchOwnership('thread-1', OwnershipType.HUMAN, 'agent-1', 'SYSTEM');
 
         expect(result.ownership).toBe(OwnershipType.HUMAN);
-        expect(threadRepo.updateAtomic).toHaveBeenCalled();
-        expect(auditService.append).toHaveBeenCalled();
+        expect(threadRepo.updateAtomic).toHaveBeenCalledWith('thread-1', 1, expect.objectContaining({
+            ownership: OwnershipType.HUMAN,
+            is_locked: true,
+        }));
+        expect(auditService.append).toHaveBeenCalledWith(expect.objectContaining({
+            actor_type: 'SYSTEM',
+        }));
         expect(metricsService.incrementOwnershipSwitchCount).toHaveBeenCalled();
     });
 
@@ -71,8 +76,10 @@ describe('OwnershipService', () => {
     });
 
     it('should toggle lock', async () => {
-        await service.toggleLock('thread-1', true, 'agent-1');
+        await service.toggleLock('thread-1', true, 'agent-1', 'HUMAN');
         expect(threadRepo.updateAtomic).toHaveBeenCalledWith('thread-1', 1, { is_locked: true });
-        expect(auditService.append).toHaveBeenCalled();
+        expect(auditService.append).toHaveBeenCalledWith(expect.objectContaining({
+            actor_type: 'HUMAN',
+        }));
     });
 });
