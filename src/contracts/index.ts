@@ -1,7 +1,7 @@
 import { SentimentEvaluation, Thread } from '../types';
 
 export interface SentimentProvider {
-    evaluate(text: string): Promise<{ score: number; label: string }>;
+    evaluate(text: string, options?: { threadId?: string }): Promise<{ score: number; label: string }>;
 }
 
 export interface EscalationPolicy {

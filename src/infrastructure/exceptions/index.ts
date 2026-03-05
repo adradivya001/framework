@@ -19,3 +19,13 @@ export class AISuppressionException extends HttpException {
         }, HttpStatus.FORBIDDEN);
     }
 }
+
+export class InvalidTransitionError extends HttpException {
+    constructor(message: string) {
+        super({
+            statusCode: HttpStatus.BAD_REQUEST,
+            error: 'Bad Request',
+            message,
+        }, HttpStatus.BAD_REQUEST);
+    }
+}

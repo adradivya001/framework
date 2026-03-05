@@ -106,3 +106,29 @@ CREATE TABLE IF NOT EXISTS dead_letter_queue (
     attempts    INTEGER NOT NULL DEFAULT 0,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- ============================================================
+-- users (Login Credentials — Multi-Domain Generic)
+-- One users table serves ALL domains registered in this Control Tower.
+-- Email uniqueness is enforced per-domain, not globally.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS users (
+    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email           TEXT NOT NULL,
+    password_hash   TEXT NOT NULL,
+    full_name       TEXT NOT NULL,
+    role            TEXT NOT NULL,          -- domain-specific role, e.g. CRO | DOCTOR | NURSE
+    domain          TEXT NOT NULL,          -- e.g. 'janmasethu', 'oncology', 'cardiology'
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    -- Same email can exist in different domains (different apps)
+    CONSTRAINT uq_users_email_domain UNIQUE (email, domain)
+);
+CREATE INDEX IF NOT EXISTS idx_users_email   ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_role    ON users(role);
+CREATE INDEX IF NOT EXISTS idx_users_domain  ON users(domain);
+
+
+

@@ -23,7 +23,7 @@ export class SentimentService {
             return;
         }
 
-        const evaluation = await plugins.sentimentProvider.evaluate(content);
+        const evaluation = await plugins.sentimentProvider.evaluate(content, { threadId });
 
         // Store evaluation
         await this.sentimentRepository.create({
@@ -35,14 +35,28 @@ export class SentimentService {
         });
 
         const thread = await this.threadService.getThread(threadId);
+        const currentStatus = thread.status;
+        const newLabel = evaluation.label.toLowerCase();
 
-        // If red, trigger status update and MANDATORY escalation
-        if (evaluation.label === 'red') {
-            await this.threadService.updateThreadStatusWithVersionCheck(threadId, ThreadStatus.RED, thread.version);
+        // Severity weight map for comparison
+        const statusWeight: Record<string, number> = {
+            [ThreadStatus.GREEN]: 0,
+            [ThreadStatus.YELLOW]: 1,
+            [ThreadStatus.RED]: 2,
+        };
 
-            // MANDATE: Automatically invoke routeToHuman() and switchOwnership without exception.
-            this.logger.log(`SentimentEngine: Red sentiment detected for thread ${threadId}. Triggering mandatory escalation.`);
-            await this.routingService.routeToHuman(threadId, 'SENTIMENT_ENGINE');
+        const targetStatus = newLabel === 'red' ? ThreadStatus.RED : (newLabel === 'yellow' ? ThreadStatus.YELLOW : ThreadStatus.GREEN);
+
+        // Only update if it's an upgrade (GREEN -> YELLOW, GREEN -> RED, YELLOW -> RED)
+        if (statusWeight[targetStatus] > statusWeight[currentStatus]) {
+            await this.threadService.updateThreadStatusWithVersionCheck(threadId, targetStatus, thread.version);
+            this.logger.log(`SentimentEngine: Escalating status for thread ${threadId}: ${currentStatus} -> ${targetStatus}`);
+
+            // If it becomes RED, trigger mandatory human routing
+            if (targetStatus === ThreadStatus.RED) {
+                this.logger.log(`SentimentEngine: Red sentiment detected for thread ${threadId}. Triggering mandatory human escalation.`);
+                await this.routingService.routeToHuman(threadId, 'SENTIMENT_ENGINE');
+            }
         }
     }
 }

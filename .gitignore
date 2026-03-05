@@ -18,9 +18,33 @@ lerna-debug.log*
 # OS
 .DS_Store
 
-# Tests
+# Tests — coverage outputs
 /coverage
 /.nyc_output
+
+# ============================================================
+# Test files — kept locally only, never pushed to repo
+# ============================================================
+
+# Root-level scratch/manual test scripts
+test-*.js
+test-*.ts
+
+# Unit test spec files (stays local for development only)
+**/*.spec.ts
+**/*.spec.js
+**/*.e2e-spec.ts
+
+# Integration test directory
+/test/
+
+# Test configuration files
+docker-compose.test.yml
+
+# Test reports and documentation
+alignment_and_testing_report.md
+alignment_report.md
+
 
 # IDEs and editors
 /.idea

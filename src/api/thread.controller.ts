@@ -73,7 +73,7 @@ export class ThreadController {
 
     @Post('ownership/switch')
     async switchOwnership(@Body() dto: SwitchOwnershipDto) {
-        return this.ownershipService.switchOwnership(dto.thread_id, dto.ownership, dto.actor_id, {
+        return this.ownershipService.switchOwnership(dto.thread_id, dto.ownership, dto.actor_id, 'HUMAN', {
             assignedRole: dto.assigned_role,
         });
     }
