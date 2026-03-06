@@ -59,4 +59,25 @@ export class ThreadRepository {
         if (error) throw error;
         return data;
     }
+
+    async findAll(): Promise<Thread[]> {
+        const { data, error } = await this.supabase
+            .from('conversation_threads')
+            .select('*')
+            .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    async findByStatus(status: string): Promise<Thread[]> {
+        const { data, error } = await this.supabase
+            .from('conversation_threads')
+            .select('*')
+            .eq('status', status)
+            .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+    }
 }

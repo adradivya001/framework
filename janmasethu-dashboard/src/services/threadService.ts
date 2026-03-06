@@ -5,56 +5,52 @@ export interface Thread {
     domain: string;
     user_id: string;
     channel: string;
-    status: "green" | "yellow" | "red";
-    ownership: "AI" | "HUMAN";
-    assigned_role?: string;
-    assigned_user_id?: string;
+    status: 'green' | 'yellow' | 'red';
+    ownership: 'AI' | 'HUMAN';
+    assigned_role: string | null;
+    assigned_user_id: string | null;
     is_locked: boolean;
     version: number;
     created_at: string;
     updated_at: string;
 }
 
+export interface Message {
+    id: string;
+    thread_id: string;
+    sender_id: string;
+    sender_type: 'USER' | 'AI' | 'HUMAN';
+    content: string;
+    created_at: string;
+}
+
+// Janmasethu Specific Endpoints
+export const fetchJanmasethuThreads = () => api.get<Thread[]>("/janmasethu/threads").then(res => res.data);
+
+export const fetchThreadContext = (threadId: string) =>
+    api.get<Message[]>(`/janmasethu/context/${threadId}`).then(res => res.data);
+
+export const takeControl = (threadId: string) =>
+    api.post(`/janmasethu/take-control/${threadId}`);
+
+export const sendHumanReply = (payload: { thread_id: string; content: string }) =>
+    api.post("/janmasethu/reply", {
+        ...payload,
+        sender_type: "HUMAN"
+    });
+
+export const assignThread = (threadId: string, assignedUser: string, assignedRole: string) =>
+    api.post(`/janmasethu/assign/${threadId}`, {
+        targetUserId: assignedUser,
+        targetRole: assignedRole
+    });
+
 export const threadService = {
-    getAllThreads: async (): Promise<Thread[]> => {
-        // Note: In a real app, there might be a specific endpoint for all threads.
-        // For now, we assume searching or a generic fetch.
-        const response = await api.get<Thread[]>("/thread/all"); // Assuming /thread/all exists or mapping to /threads
-        return response.data;
-    },
-
-    getThreadById: async (id: string): Promise<Thread> => {
-        const response = await api.get<Thread>(`/thread/${id}`);
-        return response.data;
-    },
-
-    switchOwnership: async (
-        threadId: string,
-        ownership: "AI" | "HUMAN",
-        actorId: string,
-        assignedRole?: string
-    ) => {
-        const response = await api.post("/thread/ownership/switch", {
-            thread_id: threadId,
-            ownership,
-            actor_id: actorId,
-            assigned_role: assignedRole,
-        });
-        return response.data;
-    },
-
-    sendMessage: async (
-        threadId: string,
-        senderId: string,
-        senderType: "USER" | "AI" | "HUMAN",
-        content: string
-    ) => {
-        const response = await api.post("/thread/event/message", {
-            thread_id: threadId,
-            sender_id: senderId,
-            sender_type: senderType,
-            content,
-        });
-        return response.data;
-    },
+    getThreads: fetchJanmasethuThreads,
+    getContext: fetchThreadContext,
+    switchOwnership: takeControl,
+    sendMessage: sendHumanReply,
+    assignThread: assignThread
 };
+
+export default threadService;

@@ -3,6 +3,7 @@ import { ThreadService } from '../kernel/thread/thread.service';
 import { OwnershipService } from '../kernel/ownership/ownership.service';
 import { SentimentService } from '../kernel/sentiment/sentiment.service';
 import { GuardrailService } from '../kernel/guardrail/guardrail.service';
+import { AuditService } from '../kernel/audit/audit.service';
 import { RateLimiterService } from '../kernel/rate-limiter.service';
 import { Channel, OwnershipType } from '../types';
 import { AISuppressionGuard } from '../infrastructure/ai-suppression.guard';
@@ -37,6 +38,7 @@ export class ThreadController {
         private readonly sentimentService: SentimentService,
         private readonly guardrailService: GuardrailService,
         private readonly rateLimiter: RateLimiterService,
+        private readonly auditService: AuditService,
     ) { }
 
     @Post('init')
@@ -76,6 +78,50 @@ export class ThreadController {
         return this.ownershipService.switchOwnership(dto.thread_id, dto.ownership, dto.actor_id, 'HUMAN', {
             assignedRole: dto.assigned_role,
         });
+    }
+
+    @Get('all')
+    async getAll() {
+        return this.threadService.getAllThreads();
+    }
+
+    @Get('queue/doctor')
+    async getDoctorQueue() {
+        return this.threadService.getThreadsByStatus('red');
+    }
+
+    @Get('queue/nurse')
+    async getNurseQueue() {
+        return this.threadService.getThreadsByStatus('yellow');
+    }
+
+    @Get('queue/ai')
+    async getAIQueue() {
+        return this.threadService.getThreadsByStatus('green');
+    }
+
+    @Get('context/:id')
+    async getContext(@Param('id') threadId: string) {
+        return this.threadService.getMessages(threadId);
+    }
+
+    @Post('assign')
+    async assign(@Body() body: { thread_id: string; assigned_user: string; assigned_role: string }) {
+        return this.ownershipService.switchOwnership(
+            body.thread_id,
+            OwnershipType.HUMAN,
+            'SYSTEM',
+            'HUMAN',
+            {
+                assignedRole: body.assigned_role,
+                assignedUserId: body.assigned_user
+            }
+        );
+    }
+
+    @Get('audit/all')
+    async getAudits() {
+        return this.auditService.getAll();
     }
 
     private sanitizeMetadata(metadata: Record<string, any>): Record<string, any> {

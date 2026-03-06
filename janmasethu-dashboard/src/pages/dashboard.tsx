@@ -3,30 +3,49 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import ThreadCard from '../components/threads/ThreadCard';
 import ThreadContextModal from '../components/threads/ThreadContextModal';
 import { useAuth } from '../hooks/useAuth';
-import { useMockThreads } from '../hooks/useMockThreads';
-import { MockThread } from '../data/mockThreads';
+import { useThreads, useTakeControl, useSendReply, useAssignThread } from '../hooks/useThreads';
+import { Thread } from '../services/threadService';
 import { AlertCircle, Users, Activity, MessageSquare, TrendingUp } from 'lucide-react';
 
 export default function Dashboard() {
     const { user } = useAuth();
-    const { threads, allThreads, takeControl, assignThread, sendReply } = useMockThreads(user?.role, user?.name);
-    const [selectedThread, setSelectedThread] = useState<MockThread | null>(null);
+    const { data: threads = [], isLoading: threadsLoading } = useThreads();
 
-    const redCount = allThreads.filter((t) => t.severity === 'RED').length;
-    const yellowCount = allThreads.filter((t) => t.severity === 'YELLOW').length;
-    const greenCount = allThreads.filter((t) => t.severity === 'GREEN').length;
+    const takeControlMutation = useTakeControl();
+    const sendReplyMutation = useSendReply();
+    const assignThreadMutation = useAssignThread();
+
+    const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+
+    // Derived stats from visible threads 
+    // (Note: For CRO this is global, for others it is scoped)
+    const redCount = threads.filter((t) => t.status === 'red').length;
+    const yellowCount = threads.filter((t) => t.status === 'yellow').length;
+    const greenCount = threads.filter((t) => t.status === 'green').length;
 
     const stats = [
-        { name: 'Total Threads', value: allThreads.length, icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
+        { name: 'Total Active', value: threads.length, icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
         { name: 'Red Alerts', value: redCount, icon: AlertCircle, color: 'text-red-500', bg: 'bg-red-50' },
         { name: 'Nurse Queue', value: yellowCount, icon: Users, color: 'text-amber-500', bg: 'bg-amber-50' },
         { name: 'AI Active', value: greenCount, icon: Activity, color: 'text-green-500', bg: 'bg-green-50' },
     ];
 
-    const urgentThreads = threads.filter((t) => t.severity === 'RED' || t.severity === 'YELLOW');
+    const urgentThreads = threads.filter((t) => t.status === 'red' || t.status === 'yellow');
+
+    const handleTakeControl = (threadId: string) => {
+        takeControlMutation.mutate(threadId);
+    };
+
+    const handleSendReply = (threadId: string, content: string) => {
+        sendReplyMutation.mutate({ thread_id: threadId, content });
+    };
+
+    const handleAssign = (threadId: string, assignedUser: string, assignedRole: string) => {
+        assignThreadMutation.mutate({ thread_id: threadId, assigned_user: assignedUser, assigned_role: assignedRole });
+    };
 
     return (
-        <DashboardLayout>
+        <DashboardLayout title="Dashboard">
             <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex items-center justify-between">
@@ -34,16 +53,16 @@ export default function Dashboard() {
                         <h1 className="text-2xl font-bold text-slate-900">Hospital Control Tower</h1>
                         <p className="text-slate-500 text-sm mt-0.5">Janmasethu Janani · Medical Orchestration System</p>
                     </div>
-                    <div className="flex items-center space-x-2 text-xs text-slate-500 bg-white border border-slate-200 rounded-lg px-3 py-2">
+                    <div className="flex items-center space-x-2 text-xs text-slate-500 bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
                         <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span>Live · Polling every 5s</span>
+                        <span>Backend Connected · Polling every 5s</span>
                     </div>
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {stats.map((stat) => (
-                        <div key={stat.name} className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-sm transition-shadow">
+                        <div key={stat.name} className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-3">
                                 <div className={`rounded-lg p-2.5 ${stat.bg}`}>
                                     <stat.icon size={18} className={stat.color} />
@@ -57,7 +76,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Severity Distribution */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
                     <h3 className="font-semibold text-slate-800 mb-4">Severity Distribution</h3>
                     <div className="space-y-4">
                         {[
@@ -73,7 +92,7 @@ export default function Dashboard() {
                                 <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                                     <div
                                         className={`h-full rounded-full ${item.color} transition-all duration-500`}
-                                        style={{ width: `${allThreads.length ? (item.count / allThreads.length) * 100 : 0}%` }}
+                                        style={{ width: `${threads.length ? (item.count / threads.length) * 100 : 0}%` }}
                                     />
                                 </div>
                             </div>
@@ -91,10 +110,16 @@ export default function Dashboard() {
                             </span>
                         )}
                     </h3>
-                    {urgentThreads.length === 0 ? (
+                    {threadsLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="bg-slate-50 border border-slate-200 rounded-xl h-48 animate-pulse" />
+                            ))}
+                        </div>
+                    ) : urgentThreads.length === 0 ? (
                         <div className="bg-white border border-slate-200 rounded-xl py-16 text-center text-slate-400">
                             <Activity size={40} className="mx-auto mb-3 opacity-20" />
-                            <p>No active alerts. All threads are AI-managed.</p>
+                            <p>No active alerts. All threads are AI-managed or resolved.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -102,9 +127,9 @@ export default function Dashboard() {
                                 <ThreadCard
                                     key={thread.id}
                                     thread={thread}
-                                    currentRole={user!.role}
+                                    currentRole={user?.role || 'NURSE'}
                                     onView={setSelectedThread}
-                                    onTakeControl={(id) => takeControl(id, user!.role)}
+                                    onTakeControl={handleTakeControl}
                                 />
                             ))}
                         </div>
@@ -115,12 +140,12 @@ export default function Dashboard() {
             {selectedThread && (
                 <ThreadContextModal
                     thread={selectedThread}
-                    currentRole={user!.role}
-                    currentUserName={user!.name}
+                    currentRole={user?.role || 'NURSE'}
+                    currentUserName={user?.name || 'User'}
                     onClose={() => setSelectedThread(null)}
-                    onTakeControl={(id) => takeControl(id, user!.role)}
-                    onSendReply={sendReply}
-                    onAssign={assignThread}
+                    onTakeControl={handleTakeControl}
+                    onSendReply={handleSendReply}
+                    onAssign={handleAssign}
                 />
             )}
         </DashboardLayout>

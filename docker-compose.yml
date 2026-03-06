@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./control-tower-core
+    ports:
+      - "3001:3000" # Host:Container
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SUPABASE_URL=https://vhedpucowbjabgiklyea.supabase.co
+      - SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoZWRwdWNvd2JqYWJnaWtseWVhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTk4OTQzNywiZXhwIjoyMDg3NTY1NDM3fQ._RBmUFpQgwSrTOnuB6A9w_W4jaD80Seaqd8ydV1tIk8
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - control-tower-net
+
+  frontend:
+    build: ./janmasethu-dashboard
+    ports:
+      - "3002:3000" # Host:Container (Using port 3002 for frontend)
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - control-tower-net
+
+  db:
+    image: postgres:15-bookworm
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=control_tower
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./control-tower-core/db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d control_tower" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - control-tower-net
+
+  redis:
+    image: redis:7-bookworm
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - control-tower-net
+
+volumes:
+  postgres_data:
+
+
+networks:
+  control-tower-net:
+    driver: bridge

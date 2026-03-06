@@ -10,6 +10,9 @@ import { JanmasethuTakeoverService } from './janmasethu.takeover';
 import { JanmasethuAssignmentService } from './janmasethu.assignment';
 import { JanmasethuController } from './janmasethu.controller';
 import { JanmasethuRiskService } from './risk-engine/janmasethu-risk.service';
+import { JanmasethuChannelService } from './channel/janmasethu-channel.service';
+import { JanmasethuDispatchService } from './channel/janmasethu-dispatch.service';
+import { JanmasethuChannelController } from './channel/janmasethu-channel.controller';
 import { ProviderRegistry } from '../../kernel/services/provider-registry.service';
 import { JANMASETHU_DOMAIN } from './janmasethu.types';
 
@@ -29,9 +32,22 @@ import { JANMASETHU_DOMAIN } from './janmasethu.types';
         JanmasethuTakeoverService,
         JanmasethuAssignmentService,
         JanmasethuRiskService,
+        JanmasethuChannelService,
+        JanmasethuDispatchService,
     ],
-    controllers: [JanmasethuController],
-    exports: [JanmasethuHandler, JanmasethuAssignmentService, JanmasethuTakeoverService, JanmasethuScopePolicy, JanmasethuContextService],
+    controllers: [
+        JanmasethuController,
+        JanmasethuChannelController
+    ],
+    exports: [
+        JanmasethuHandler,
+        JanmasethuAssignmentService,
+        JanmasethuTakeoverService,
+        JanmasethuScopePolicy,
+        JanmasethuContextService,
+        JanmasethuChannelService,
+        JanmasethuDispatchService,
+    ],
 })
 export class JanmasethuModule implements OnModuleInit {
     private readonly logger = new Logger(JanmasethuModule.name);

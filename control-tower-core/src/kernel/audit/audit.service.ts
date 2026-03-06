@@ -23,4 +23,15 @@ export class AuditService {
             // In production, we might want to handle this more robustly (e.g., local buffer or alerting)
         }
     }
+
+    async getAll(): Promise<AuditLog[]> {
+        const { data, error } = await this.supabase
+            .from('audit_logs')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+        if (error) throw error;
+        return data || [];
+    }
 }

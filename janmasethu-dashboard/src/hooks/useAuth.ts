@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { UserRole } from '../data/mockThreads';
+
+export type UserRole = 'CRO' | 'DOCTOR' | 'NURSE';
 
 export interface AuthUser {
     email: string;
@@ -36,11 +37,13 @@ export function useAuth() {
     const login = (email: string, role: UserRole) => {
         const userData = { email, role };
         localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('role', role); // For index redirect
         setUser({ ...ROLE_PROFILES[role], email });
     };
 
     const logout = () => {
         localStorage.removeItem('user');
+        localStorage.removeItem('role');
         setUser(null);
     };
 

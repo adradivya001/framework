@@ -6,6 +6,7 @@ import { ThreadController } from './api/thread.controller';
 import { HealthController } from './api/health.controller';
 import { DatabaseModule } from './infrastructure/database.module';
 import { QueueModule } from './infrastructure/queue.module';
+import { JanmasethuModule } from './domains/janmasethu/janmasethu.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -18,6 +19,7 @@ import configuration from './config/configuration';
     TerminusModule,
     DatabaseModule,
     QueueModule,
+    JanmasethuModule,
     // Register a 'test' domain to verify the framework is working
     KernelModule.register({
       sentimentProvider: {

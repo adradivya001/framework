@@ -117,4 +117,16 @@ export class ThreadService {
             throw error;
         }
     }
+
+    async getAllThreads(): Promise<Thread[]> {
+        return this.threadRepository.findAll();
+    }
+
+    async getThreadsByStatus(status: string): Promise<Thread[]> {
+        return this.threadRepository.findByStatus(status);
+    }
+
+    async getMessages(threadId: string): Promise<Message[]> {
+        return this.messageRepository.findByThread(threadId);
+    }
 }

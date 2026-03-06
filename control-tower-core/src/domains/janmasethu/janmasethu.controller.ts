@@ -1,6 +1,6 @@
 import {
     Controller, Post, Get, Body, Param, Headers,
-    UnauthorizedException, BadRequestException, Logger, UseGuards
+    UnauthorizedException, BadRequestException, Logger
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JanmasethuHandler } from './janmasethu.handler';
@@ -8,9 +8,11 @@ import { JanmasethuAssignmentService } from './janmasethu.assignment';
 import { JanmasethuTakeoverService } from './janmasethu.takeover';
 import { JanmasethuContextService } from './janmasethu.context';
 import { JanmasethuRepository } from './janmasethu.repository';
+import { JanmasethuDispatchService } from './channel/janmasethu-dispatch.service';
+import { ThreadService } from '../../kernel/thread/thread.service';
 import { JANMASETHU_DOMAIN, JanmasethuUserRole, JanmasethuUserContext } from './janmasethu.types';
 
-@Controller('control-tower/janmasethu')
+@Controller('janmasethu')
 export class JanmasethuController {
     private readonly logger = new Logger(JanmasethuController.name);
 
@@ -20,44 +22,20 @@ export class JanmasethuController {
         private readonly takeoverService: JanmasethuTakeoverService,
         private readonly contextService: JanmasethuContextService,
         private readonly repository: JanmasethuRepository,
+        private readonly threadService: ThreadService,
+        private readonly dispatchService: JanmasethuDispatchService,
         private readonly configService: ConfigService,
     ) { }
 
-    /**
-     * Helper to mock auth context extraction.
-     * In production, this would be a NestJS Guard/Decorator extracting from JWT.
-     */
     private getUserContext(headers: Record<string, any>): JanmasethuUserContext {
         const userId = headers['x-user-id'];
         const userRole = headers['x-user-role'] as JanmasethuUserRole;
 
         if (!userId || !userRole) {
-            throw new UnauthorizedException('Missing user context (x-user-id, x-user-role)');
+            throw new UnauthorizedException('Missing user context');
         }
 
         return { id: userId, role: userRole };
-    }
-
-    @Post('events')
-    async handleEvents(
-        @Body() event: any,
-        @Headers('x-internal-api-key') apiKey: string
-    ) {
-        const expectedKey = this.configService.get<string>('INTERNAL_API_KEY') || 'mock-key';
-        if (apiKey !== expectedKey) {
-            throw new UnauthorizedException('Invalid API Key');
-        }
-
-        if (event.domain !== JANMASETHU_DOMAIN) {
-            throw new BadRequestException(`Mismatched domain: ${event.domain}`);
-        }
-
-        if (event.type === 'MESSAGE_CREATED') {
-            await this.handler.handleMessageCreated(event);
-            return { status: 'success', threadId: event.thread_id };
-        }
-
-        return { status: 'ignored' };
     }
 
     @Get('threads')
@@ -66,7 +44,7 @@ export class JanmasethuController {
         return this.repository.findThreads(user);
     }
 
-    @Get('threads/:id/context')
+    @Get('context/:id')
     async getThreadContext(
         @Param('id') threadId: string,
         @Headers() headers: any
@@ -75,7 +53,7 @@ export class JanmasethuController {
         return this.contextService.getThreadContext(threadId, user);
     }
 
-    @Post('threads/:id/assign')
+    @Post('assign/:id')
     async assignThread(
         @Param('id') threadId: string,
         @Body() body: any,
@@ -83,12 +61,11 @@ export class JanmasethuController {
     ) {
         const user = this.getUserContext(headers);
         const { targetUserId, targetRole } = body;
-
         await this.assignmentService.assignThread(threadId, targetUserId, targetRole, user);
         return { status: 'assigned', threadId };
     }
 
-    @Post('threads/:id/take-control')
+    @Post('take-control/:id')
     async takeControl(
         @Param('id') threadId: string,
         @Headers() headers: any
@@ -98,13 +75,30 @@ export class JanmasethuController {
         return { status: 'controlled', threadId };
     }
 
-    @Post('threads/:id/release-control')
-    async releaseControl(
-        @Param('id') threadId: string,
+    @Post('reply')
+    async handleReply(
+        @Body() body: { thread_id: string; sender_type: string; content: string },
         @Headers() headers: any
     ) {
         const user = this.getUserContext(headers);
-        await this.takeoverService.releaseControl(threadId, user);
-        return { status: 'released', threadId };
+
+        // 1. Save message to thread
+        await this.threadService.appendMessage(body.thread_id, {
+            sender_id: user.id,
+            sender_type: 'HUMAN',
+            content: body.content,
+        });
+
+        // 2. Fetch thread to get channel and original userId
+        const thread = await this.threadService.getThread(body.thread_id);
+
+        // 3. Dispatch to external channel
+        await this.dispatchService.dispatchResponse(
+            thread.channel,
+            thread.user_id,
+            body.content
+        );
+
+        return { status: 'sent', thread_id: body.thread_id };
     }
 }

@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { MockThread, UserRole, STAFF_LIST } from '../../data/mockThreads';
+import { Thread, Message } from '../../services/threadService';
+import { UserRole } from '../../hooks/useAuth';
+import { useThreadContext } from '../../hooks/useThreads';
 import { X, Send, Lock, User, Bot, ChevronDown } from 'lucide-react';
 
 interface Props {
-    thread: MockThread;
+    thread: Thread;
     currentRole: UserRole;
     currentUserName: string;
     onClose: () => void;
     onTakeControl: (threadId: string) => void;
-    onSendReply: (threadId: string, text: string, senderLabel: string) => void;
-    onAssign: (threadId: string, assignedUser: string, assignedRole: 'DOCTOR' | 'NURSE') => void;
+    onSendReply: (threadId: string, content: string) => void;
+    onAssign: (threadId: string, assignedUser: string, assignedRole: string) => void;
 }
 
 const SEVERITY_HEADER: Record<string, string> = {
-    RED: 'from-red-500 to-red-600',
-    YELLOW: 'from-amber-400 to-amber-500',
-    GREEN: 'from-green-500 to-green-600',
+    red: 'from-red-500 to-red-600',
+    yellow: 'from-amber-400 to-amber-500',
+    green: 'from-green-500 to-green-600',
 };
 
 const BUBBLE: Record<string, string> = {
@@ -24,30 +26,38 @@ const BUBBLE: Record<string, string> = {
     HUMAN: 'bg-slate-800 text-white rounded-tr-sm',
 };
 
+const MOCK_STAFF = [
+    { name: 'Dr. Samuel', role: 'DOCTOR' },
+    { name: 'Dr. Smith', role: 'DOCTOR' },
+    { name: 'Nurse Mary', role: 'NURSE' },
+    { name: 'Nurse John', role: 'NURSE' },
+];
+
 function timeFmt(t: string) {
     return new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 export default function ThreadContextModal({ thread, currentRole, currentUserName, onClose, onTakeControl, onSendReply, onAssign }: Props) {
+    const { data: messages = [], isLoading } = useThreadContext(thread.id);
     const [reply, setReply] = useState('');
     const [selectedStaff, setSelectedStaff] = useState('');
 
-    const isOwner = thread.owner === currentRole;
-    const canTakeControl =
-        !thread.assigned &&
-        ((currentRole === 'DOCTOR' && thread.severity === 'RED') ||
-            (currentRole === 'NURSE' && thread.severity === 'YELLOW') ||
-            currentRole === 'CRO');
+    const isOwner = thread.ownership === 'HUMAN' && (thread.assigned_user_id === currentUserName || currentRole === 'CRO');
+    const canTakeControl = !thread.is_locked && (
+        currentRole === 'CRO' ||
+        (currentRole === 'DOCTOR' && thread.status === 'red') ||
+        (currentRole === 'NURSE' && thread.status === 'yellow')
+    );
 
     const handleSend = (e: React.FormEvent) => {
         e.preventDefault();
         if (!reply.trim()) return;
-        onSendReply(thread.id, reply.trim(), currentUserName);
+        onSendReply(thread.id, reply.trim());
         setReply('');
     };
 
     const handleAssign = () => {
-        const staff = STAFF_LIST.find((s) => s.name === selectedStaff);
+        const staff = MOCK_STAFF.find((s) => s.name === selectedStaff);
         if (!staff || !selectedStaff) return;
         onAssign(thread.id, staff.name, staff.role);
         setSelectedStaff('');
@@ -58,14 +68,14 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
             <div className="flex h-[88vh] w-full max-w-3xl flex-col rounded-2xl bg-white shadow-2xl overflow-hidden">
 
                 {/* Header gradient */}
-                <div className={`bg-gradient-to-r ${SEVERITY_HEADER[thread.severity]} px-6 py-4 flex items-center justify-between`}>
+                <div className={`bg-gradient-to-r ${SEVERITY_HEADER[thread.status] || SEVERITY_HEADER.green} px-6 py-4 flex items-center justify-between`}>
                     <div className="flex items-center space-x-3">
                         <span className="bg-white/25 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-                            {thread.severity}
+                            {thread.status}
                         </span>
                         <div>
                             <h3 className="text-white font-bold text-sm">Thread Context</h3>
-                            <p className="text-white/70 text-xs">Patient: {thread.patient} · {thread.id}</p>
+                            <p className="text-white/70 text-xs">Patient: {thread.user_id} · {thread.id.slice(-8)}</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="rounded-full p-1.5 bg-white/20 hover:bg-white/30 transition-colors">
@@ -77,12 +87,12 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
                 <div className="flex items-center justify-between bg-slate-50 border-b border-slate-200 px-6 py-3 flex-wrap gap-2">
                     <div className="flex items-center space-x-3 text-sm">
                         <div className="flex items-center space-x-1.5">
-                            <div className={`h-2 w-2 rounded-full ${thread.assigned ? 'bg-slate-400' : 'bg-green-500 animate-pulse'}`}></div>
+                            <div className={`h-2 w-2 rounded-full ${thread.is_locked ? 'bg-amber-500' : 'bg-green-500 animate-pulse'}`}></div>
                             <span className="text-slate-600 font-medium text-xs">
-                                {thread.assignedUser
-                                    ? `Assigned to: ${thread.assignedUser}`
-                                    : thread.assigned
-                                        ? `Controlled by ${thread.owner}`
+                                {thread.assigned_user_id
+                                    ? `Assigned to: ${thread.assigned_user_id}`
+                                    : thread.is_locked
+                                        ? `Controlled by HUMAN`
                                         : 'AI Active — Unassigned'}
                             </span>
                         </div>
@@ -98,10 +108,10 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
                                 <span>Take Control</span>
                             </button>
                         )}
-                        {thread.assigned && isOwner && (
+                        {thread.is_locked && (
                             <span className="flex items-center space-x-1.5 bg-green-100 text-green-700 text-xs font-semibold px-3.5 py-1.5 rounded-lg">
                                 <Lock size={12} />
-                                <span>You have control</span>
+                                <span>{isOwner ? 'You have control' : 'Thread Locked'}</span>
                             </span>
                         )}
                     </div>
@@ -109,20 +119,27 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
 
                 {/* Conversation */}
                 <div className="flex-1 overflow-y-auto bg-slate-50/60 p-5 space-y-3">
-                    {thread.conversation.map((msg, i) => (
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-2">
+                            <div className="h-6 w-6 rounded-full border-2 border-slate-200 border-t-blue-500 animate-spin" />
+                            <p className="text-xs">Loading context...</p>
+                        </div>
+                    ) : messages.length === 0 ? (
+                        <div className="text-center py-10 text-slate-400 text-sm italic">No messages found for this thread.</div>
+                    ) : messages.map((msg, i) => (
                         <div
                             key={i}
-                            className={`flex flex-col ${msg.sender === 'USER' ? 'items-start' : 'items-end ml-auto'} max-w-[76%] ${msg.sender !== 'USER' ? 'self-end' : ''}`}
+                            className={`flex flex-col ${msg.sender_type === 'USER' ? 'items-start' : 'items-end ml-auto'} max-w-[76%] ${msg.sender_type !== 'USER' ? 'self-end' : ''}`}
                         >
                             <div className="flex items-center space-x-1.5 mb-1 px-1">
-                                {msg.sender === 'USER' ? <User size={9} className="text-slate-400" /> : msg.sender === 'AI' ? <Bot size={9} className="text-blue-400" /> : <Lock size={9} className="text-slate-600" />}
-                                <span className={`text-[10px] font-semibold uppercase ${msg.sender === 'USER' ? 'text-slate-400' : msg.sender === 'AI' ? 'text-blue-500' : 'text-slate-600'}`}>
-                                    {msg.sender}
+                                {msg.sender_type === 'USER' ? <User size={9} className="text-slate-400" /> : msg.sender_type === 'AI' ? <Bot size={9} className="text-blue-400" /> : <Lock size={9} className="text-slate-600" />}
+                                <span className={`text-[10px] font-semibold uppercase ${msg.sender_type === 'USER' ? 'text-slate-400' : msg.sender_type === 'AI' ? 'text-blue-500' : 'text-slate-600'}`}>
+                                    {msg.sender_type}
                                 </span>
-                                <span className="text-[10px] text-slate-300">· {timeFmt(msg.timestamp)}</span>
+                                <span className="text-[10px] text-slate-300">· {timeFmt(msg.created_at)}</span>
                             </div>
-                            <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm ${BUBBLE[msg.sender]}`}>
-                                {msg.text}
+                            <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm ${BUBBLE[msg.sender_type] || BUBBLE.USER}`}>
+                                {msg.content}
                             </div>
                         </div>
                     ))}
@@ -143,8 +160,8 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
                                         className="w-full h-9 appearance-none rounded-lg border border-slate-200 px-3.5 pr-8 text-sm focus:border-blue-500 focus:outline-none bg-white text-slate-700 cursor-pointer"
                                     >
                                         <option value="">— Select Staff Member —</option>
-                                        {STAFF_LIST.map((s) => (
-                                            <option key={s.name} value={s.name}>{s.name}</option>
+                                        {MOCK_STAFF.map((s) => (
+                                            <option key={s.name} value={s.name}>{s.name} ({s.role})</option>
                                         ))}
                                     </select>
                                     <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -163,15 +180,15 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
                     {/* Human Response Section */}
                     <div className="px-5 py-4">
                         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Human Response</p>
-                        {!thread.assigned ? (
+                        {!thread.is_locked ? (
                             <div className="flex items-center space-x-2 text-sm text-slate-400 italic bg-slate-50 rounded-lg px-4 py-2.5 border border-slate-100">
                                 <Lock size={13} />
                                 <span>Take control of this thread to send a clinical response.</span>
                             </div>
-                        ) : thread.owner !== currentRole ? (
+                        ) : thread.ownership !== 'HUMAN' ? (
                             <div className="flex items-center space-x-2 text-sm text-slate-400 italic bg-slate-50 rounded-lg px-4 py-2.5 border border-slate-100">
                                 <Lock size={13} />
-                                <span>Controlled by <strong>{thread.owner}</strong>. Read-only mode.</span>
+                                <span>Controlled by <strong>{thread.ownership}</strong>. Read-only mode.</span>
                             </div>
                         ) : (
                             <form onSubmit={handleSend} className="flex space-x-2">

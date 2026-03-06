@@ -52,6 +52,7 @@ export interface ControlTowerOptions {
         OwnershipService,
         RoutingService,
         SentimentService,
+        AuditModule,
         GuardrailModule,
         MetricsModule,
         RateLimiterService,
