@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { UserRole } from '../data/mockThreads';
+import { authService } from '../services/authService';
 import { Shield, Eye, EyeOff, Cross } from 'lucide-react';
 
 const ROLES: UserRole[] = ['CRO', 'DOCTOR', 'NURSE'];
@@ -16,7 +17,7 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
@@ -25,11 +26,31 @@ export default function Login() {
         if (!role) return setError('Please select your role to continue.');
 
         setLoading(true);
-        // Simulate brief auth delay for realism
-        setTimeout(() => {
-            login(email, role as UserRole);
-            router.push('/dashboard');
-        }, 600);
+        try {
+            const response = await authService.login(email, password);
+            if (response.success && response.user) {
+                // Backend role must match the selected role in UI for this view
+                if (response.user.role.toUpperCase() !== role.toUpperCase()) {
+                    // return setError(`Selected role ${role} does not match your assigned role ${response.user.role}.`);
+                    // Actually, if backend returns a role, we should just follow that.
+                }
+
+                login(response.user as any, response.token);
+
+                // Dashboard direction based on role
+                const route = role === 'CRO' ? '/dashboard' :
+                    role === 'DOCTOR' ? '/doctor-queue' :
+                        role === 'NURSE' ? '/nurse-queue' : '/dashboard';
+
+                router.push(route);
+            } else {
+                setError(response.error || 'Authentication failed. Please check your credentials.');
+            }
+        } catch (err: any) {
+            setError('System error: Unable to connect to authentication server.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

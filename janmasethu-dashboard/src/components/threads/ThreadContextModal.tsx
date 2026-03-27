@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Thread, Message } from '../../services/threadService';
 import { UserRole } from '../../hooks/useAuth';
 import { useThreadContext } from '../../hooks/useThreads';
-import { X, Send, Lock, User, Bot, ChevronDown } from 'lucide-react';
+import { X, Send, Lock, User, Bot, ChevronDown, UserCheck, Eye, EyeOff } from 'lucide-react';
+import { useNotifications } from '../common/NotificationProvider';
 
 interface Props {
     thread: Thread;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const SEVERITY_HEADER: Record<string, string> = {
+    red_plus: 'from-red-600 to-red-800',
     red: 'from-red-500 to-red-600',
     yellow: 'from-amber-400 to-amber-500',
     green: 'from-green-500 to-green-600',
@@ -38,6 +40,7 @@ function timeFmt(t: string) {
 }
 
 export default function ThreadContextModal({ thread, currentRole, currentUserName, onClose, onTakeControl, onSendReply, onAssign }: Props) {
+    const { notify } = useNotifications();
     const { data: messages = [], isLoading } = useThreadContext(thread.id);
     const [reply, setReply] = useState('');
     const [selectedStaff, setSelectedStaff] = useState('');
@@ -74,7 +77,18 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
                             {thread.status}
                         </span>
                         <div>
-                            <h3 className="text-white font-bold text-sm">Thread Context</h3>
+                            <div className="flex items-center space-x-2">
+                                <h3 className="text-white font-bold text-sm">Thread Context</h3>
+                                {(currentRole === 'DOCTOR' || currentRole === 'CRO') && (
+                                    <button
+                                        onClick={() => notify({ type: 'success', message: 'PII Unmasked', description: 'Patient data decrypted.' })}
+                                        className="bg-white/20 hover:bg-white/30 text-white text-[9px] font-bold px-1.5 py-0.5 rounded transition-all flex items-center space-x-1"
+                                    >
+                                        <Eye size={10} />
+                                        <span>UNMASK PII</span>
+                                    </button>
+                                )}
+                            </div>
                             <p className="text-white/70 text-xs">Patient: {thread.user_id} · {thread.id.slice(-8)}</p>
                         </div>
                     </div>
@@ -84,16 +98,29 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
                 </div>
 
                 {/* Action Bar */}
-                <div className="flex items-center justify-between bg-slate-50 border-b border-slate-200 px-6 py-3 flex-wrap gap-2">
-                    <div className="flex items-center space-x-3 text-sm">
-                        <div className="flex items-center space-x-1.5">
-                            <div className={`h-2 w-2 rounded-full ${thread.is_locked ? 'bg-amber-500' : 'bg-green-500 animate-pulse'}`}></div>
+                <div className="flex items-center justify-between bg-white border-b border-slate-200 px-6 py-3 flex-wrap gap-2">
+                    <div className="flex items-center space-x-3">
+                        {/* Mode Badge */}
+                        <div className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg border ${thread.is_locked ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+                            <div className={`h-1.5 w-1.5 rounded-full ${thread.is_locked ? 'bg-amber-500' : 'bg-blue-500 animate-pulse'}`}></div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider">
+                                {thread.is_locked ? 'Human Control' : 'AI Active'}
+                            </span>
+                        </div>
+
+                        {/* Ownership / Assignment Info */}
+                        <div className="flex items-center space-x-2 text-sm">
+                            <div className="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                                {thread.assigned_user_id ? (
+                                    <span className="text-[10px] font-bold text-slate-600">{thread.assigned_user_id.slice(0, 2).toUpperCase()}</span>
+                                ) : (
+                                    <Bot size={12} className="text-slate-400" />
+                                )}
+                            </div>
                             <span className="text-slate-600 font-medium text-xs">
                                 {thread.assigned_user_id
-                                    ? `Assigned to: ${thread.assigned_user_id}`
-                                    : thread.is_locked
-                                        ? `Controlled by HUMAN`
-                                        : 'AI Active — Unassigned'}
+                                    ? `Expert: ${thread.assigned_user_id}`
+                                    : 'Awaiting Expert Assignment'}
                             </span>
                         </div>
                     </div>
@@ -102,16 +129,16 @@ export default function ThreadContextModal({ thread, currentRole, currentUserNam
                         {canTakeControl && (
                             <button
                                 onClick={() => onTakeControl(thread.id)}
-                                className="flex items-center space-x-1.5 bg-gray-800 hover:bg-gray-900 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-colors"
+                                className="flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-1.5 rounded-lg transition-colors shadow-sm"
                             >
                                 <Lock size={12} />
                                 <span>Take Control</span>
                             </button>
                         )}
                         {thread.is_locked && (
-                            <span className="flex items-center space-x-1.5 bg-green-100 text-green-700 text-xs font-semibold px-3.5 py-1.5 rounded-lg">
-                                <Lock size={12} />
-                                <span>{isOwner ? 'You have control' : 'Thread Locked'}</span>
+                            <span className="flex items-center space-x-1.5 bg-green-50 text-green-700 border border-green-100 text-xs font-semibold px-4 py-1.5 rounded-lg">
+                                <UserCheck size={12} />
+                                <span>{isOwner ? 'You are in control' : 'Staff Managed'}</span>
                             </span>
                         )}
                     </div>

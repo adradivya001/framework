@@ -13,14 +13,16 @@ const allMenuItems = [
     { name: 'Nurse Queue', icon: Thermometer, href: '/nurse-queue', roles: ['CRO', 'NURSE'] },
     { name: 'AI Threads', icon: Bot, href: '/ai-threads', roles: ['CRO'] },
     { name: 'All Threads', icon: List, href: '/all-threads', roles: ['CRO'] },
-    { name: 'Audit Logs', icon: FileText, href: '/audit-logs', roles: ['CRO'] },
-    { name: 'System Health', icon: Activity, href: '/system-health', roles: ['CRO'] },
+    { name: 'Audit Logs', icon: FileText, href: '/audit-logs', roles: ['CRO', 'ADMIN'] },
+    { name: 'Keyword Manager', icon: List, href: '/keywords', roles: ['CRO', 'ADMIN'] },
+    { name: 'System Health', icon: Activity, href: '/system-health', roles: ['CRO', 'ADMIN'] },
 ];
 
 const ROLE_BADGE: Record<string, string> = {
     CRO: 'bg-blue-500/20 text-blue-300',
     DOCTOR: 'bg-red-500/20 text-red-300',
     NURSE: 'bg-amber-500/20 text-amber-300',
+    ADMIN: 'bg-purple-500/20 text-purple-300',
 };
 
 export default function Sidebar() {
@@ -80,8 +82,8 @@ export default function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isActive
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                ? 'bg-blue-600 text-white'
+                                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                 }`}
                         >
                             <item.icon size={17} />

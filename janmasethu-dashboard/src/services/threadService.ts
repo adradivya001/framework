@@ -5,7 +5,7 @@ export interface Thread {
     domain: string;
     user_id: string;
     channel: string;
-    status: 'green' | 'yellow' | 'red';
+    status: 'green' | 'yellow' | 'red' | 'red_plus';
     ownership: 'AI' | 'HUMAN';
     assigned_role: string | null;
     assigned_user_id: string | null;

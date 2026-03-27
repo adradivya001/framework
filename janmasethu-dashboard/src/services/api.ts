@@ -7,21 +7,33 @@ export const api = axios.create({
   }
 });
 
-// Add a request interceptor to inject auth headers
+// Request interceptor
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        config.headers['x-user-id'] = user.email;
-        config.headers['x-user-role'] = user.role;
-      } catch (e) {
-        console.error('Failed to parse user from localStorage', e);
-      }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
   }
   return config;
 });
+
+// Response interceptor
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Avoid infinite loop if already on login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login?expired=true';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

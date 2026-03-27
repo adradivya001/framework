@@ -5,7 +5,7 @@ import ThreadContextModal from '../components/threads/ThreadContextModal';
 import { useAuth } from '../hooks/useAuth';
 import { useThreads, useTakeControl, useSendReply, useAssignThread } from '../hooks/useThreads';
 import { Thread } from '../services/threadService';
-import { AlertCircle, Users, Activity, MessageSquare, TrendingUp } from 'lucide-react';
+import { AlertCircle, Users, Activity, MessageSquare, TrendingUp, Flame } from 'lucide-react';
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -19,18 +19,19 @@ export default function Dashboard() {
 
     // Derived stats from visible threads 
     // (Note: For CRO this is global, for others it is scoped)
+    const redPlusCount = threads.filter((t) => t.status === 'red_plus').length;
     const redCount = threads.filter((t) => t.status === 'red').length;
     const yellowCount = threads.filter((t) => t.status === 'yellow').length;
     const greenCount = threads.filter((t) => t.status === 'green').length;
 
     const stats = [
-        { name: 'Total Active', value: threads.length, icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
+        { name: 'Critical (Red+)', value: redPlusCount, icon: Flame, color: 'text-red-600', bg: 'bg-red-100' },
         { name: 'Red Alerts', value: redCount, icon: AlertCircle, color: 'text-red-500', bg: 'bg-red-50' },
         { name: 'Nurse Queue', value: yellowCount, icon: Users, color: 'text-amber-500', bg: 'bg-amber-50' },
         { name: 'AI Active', value: greenCount, icon: Activity, color: 'text-green-500', bg: 'bg-green-50' },
     ];
 
-    const urgentThreads = threads.filter((t) => t.status === 'red' || t.status === 'yellow');
+    const urgentThreads = threads.filter((t) => t.status === 'red_plus' || t.status === 'red' || t.status === 'yellow');
 
     const handleTakeControl = (threadId: string) => {
         takeControlMutation.mutate(threadId);
@@ -80,6 +81,7 @@ export default function Dashboard() {
                     <h3 className="font-semibold text-slate-800 mb-4">Severity Distribution</h3>
                     <div className="space-y-4">
                         {[
+                            { label: 'RED PLUS — Critical', count: redPlusCount, color: 'bg-red-600' },
                             { label: 'RED — Emergency', count: redCount, color: 'bg-red-500' },
                             { label: 'YELLOW — Moderate', count: yellowCount, color: 'bg-amber-400' },
                             { label: 'GREEN — AI Managed', count: greenCount, color: 'bg-green-500' },

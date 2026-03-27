@@ -11,6 +11,7 @@ interface ThreadCardProps {
 }
 
 const SEV: any = {
+    red_plus: { badge: 'bg-red-600 text-white border border-red-700', bar: 'border-l-red-600', ring: 'hover:border-red-500 hover:shadow-red-100' },
     red: { badge: 'bg-red-100 text-red-700 border border-red-200', bar: 'border-l-red-500', ring: 'hover:border-red-300 hover:shadow-red-50' },
     yellow: { badge: 'bg-amber-100 text-amber-700 border border-amber-200', bar: 'border-l-amber-400', ring: 'hover:border-amber-300 hover:shadow-amber-50' },
     green: { badge: 'bg-green-100 text-green-700 border border-green-200', bar: 'border-l-green-500', ring: 'hover:border-green-300 hover:shadow-green-50' },
@@ -42,7 +43,7 @@ export default function ThreadCard({ thread, currentRole, onView, onTakeControl 
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                         <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${s.badge}`}>
-                            {thread.status}
+                            {thread.status.replace('_', ' ')}
                         </span>
                         <span className="text-xs text-slate-400 font-mono font-medium">#{thread.id.slice(-8)}</span>
                     </div>
@@ -53,13 +54,18 @@ export default function ThreadCard({ thread, currentRole, onView, onTakeControl 
                 </div>
 
                 {/* Patient / User ID */}
-                <div className="flex items-center space-x-2">
-                    <div className="h-7 w-7 rounded-full bg-slate-100 flex items-center justify-center">
-                        <User size={13} className="text-slate-500" />
-                    </div>
-                    <div>
-                        <p className="text-[10px] text-slate-400 leading-none">Participant</p>
-                        <p className="text-sm font-semibold text-slate-800">{thread.user_id}</p>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                        <div className="h-7 w-7 rounded-full bg-slate-100 flex items-center justify-center relative">
+                            <User size={13} className="text-slate-500" />
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm border border-slate-100">
+                                <MessageSquare size={8} className={thread.channel === 'whatsapp' ? 'text-green-500' : 'text-blue-500'} />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-[10px] text-slate-400 leading-none">Participant via {thread.channel}</p>
+                            <p className="text-sm font-semibold text-slate-800">{thread.user_id}</p>
+                        </div>
                     </div>
                 </div>
 
