@@ -2,6 +2,7 @@ export enum JourneyStage {
     TRYING_TO_CONCEIVE = 'trying_to_conceive',
     PREGNANT = 'pregnant',
     POSTPARTUM = 'postpartum',
+    NOT_SPECIFIED = 'not_specified',
 }
 
 export interface DFOPatient {
@@ -25,6 +26,7 @@ export interface DFOPatient {
         preferred_channel: 'whatsapp' | 'web';
         quiet_hours: { start: string; end: string };
     };
+    metadata?: Record<string, any>;
 }
 
 export interface DFODoctor {

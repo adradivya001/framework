@@ -378,7 +378,7 @@ export class JanmasethuRepository {
 
     async findAuditLogs(limit: number = 100): Promise<any[]> {
         const { data, error } = await this.supabase
-            .from('dfo_audit_logs')
+            .from('audit_logs')
             .select('*')
             .order('created_at', { ascending: false })
             .limit(limit);
@@ -671,5 +671,37 @@ export class JanmasethuRepository {
             cancelled: counts['Cancelled'] || 0,
             noShow: counts['No Show'] || 0,
         };
+    }
+
+    // --- LEADS & ENGAGEMENT ---
+
+    async findLeadById(id: string) {
+        const { data, error } = await this.supabase
+            .from('sakhi_clinic_leads')
+            .select('*')
+            .eq('id', id)
+            .single();
+        if (error) throw error;
+        return data;
+    }
+
+    async insertEngagementLog(log: any) {
+        const { data, error } = await this.supabase
+            .from('dfo_engagement_logs')
+            .insert([log])
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    }
+
+    async findThreadByConsultationId(consultationId: string): Promise<string | null> {
+        const { data, error } = await this.supabase
+            .from('dfo_consultations')
+            .select('thread_id')
+            .eq('id', consultationId)
+            .single();
+        if (error) return null;
+        return data.thread_id;
     }
 }

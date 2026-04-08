@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { JanmasethuRepository } from './janmasethu.repository';
 import { JanmasethuEncryptionService } from './utils/encryption.service';
+import { JourneyStage } from './dfo.types';
+import { JanmasethuDispatchService } from './channel/janmasethu-dispatch.service';
 
 /**
  * Valid lead_status enum values from database
@@ -39,7 +41,8 @@ export class JanmasethuLeadsService {
 
     constructor(
         private readonly repository: JanmasethuRepository,
-        private readonly encryption: JanmasethuEncryptionService
+        private readonly encryption: JanmasethuEncryptionService,
+        private readonly dispatcher: JanmasethuDispatchService
     ) { }
 
     /**
@@ -162,6 +165,51 @@ export class JanmasethuLeadsService {
         if (!rawStatus) return 'New Inquiry';
         const matched = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus.trim().toLowerCase());
         return matched || 'New Inquiry';
+    }
+
+    /**
+     * LEAD CONVERSION WORKFLOW
+     * - Promotional promotion of a clinical lead to a full patient profile.
+     * - Triggers a welcome engagement nudge.
+     */
+    async convertLeadToPatient(leadId: string, doctorId: string) {
+        this.logger.log(`JanmaSethu: Converting clinical lead ${leadId} to full patient profile...`);
+        const lead = await this.repository.findLeadById(leadId);
+
+        if (!lead) throw new Error('Lead not found');
+
+        // 1. Create Patient Profile (Encrypted)
+        const patient = await this.repository.upsertDFOPatient({
+            full_name: this.encryption.encrypt(lead.name),
+            phone_number: this.encryption.encrypt(lead.phone),
+            journey_stage: JourneyStage.NOT_SPECIFIED,
+            metadata: {
+                converted_from_lead: leadId,
+                original_inquiry: this.encryption.decrypt(lead.problem),
+                treatment_onboarding: lead.treatment_suggested
+            }
+        });
+
+        // 2. Update Lead Status
+        await this.repository.updateLeadStatus(leadId, 'Converted', `Account promoted to Patient ID: ${patient.id}`);
+
+        // 3. Trigger Welcome Engagement
+        const message = `Welcome to the Janmasethu Clinical Network, ${lead.name}! 🏥 Your clinical profile is now active. How can we assist you today?`;
+        await this.dispatcher.dispatchResponse('whatsapp', lead.phone, message);
+
+        // Record the engagement
+        await this.repository.insertEngagementLog({
+            patient_id: patient.id,
+            channel: 'whatsapp',
+            content: message,
+            status: 'SENT'
+        });
+
+        return {
+            success: true,
+            patient_id: patient.id,
+            onboarding: 'WELCOME_NUDGE_SENT'
+        };
     }
 
     private looksLikeSource(value: string): boolean {

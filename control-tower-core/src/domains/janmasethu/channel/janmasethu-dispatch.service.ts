@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { ConsentEnforcementService } from '../consent/consent-enforcement.service';
+import { JanmasethuRepository } from '../janmasethu.repository';
 
 @Injectable()
 export class JanmasethuDispatchService {
@@ -10,7 +12,11 @@ export class JanmasethuDispatchService {
     private readonly smsUrl: string;
     private readonly webUrl: string;
 
-    constructor(private readonly config: ConfigService) {
+    constructor(
+        private readonly config: ConfigService,
+        private readonly consentService: ConsentEnforcementService,
+        private readonly repository: JanmasethuRepository,
+    ) {
         // Pull actual API gateways from env, use local mocks only during dev
         this.whatsappUrl = this.config.get('WHATSAPP_GATEWAY_URL') || 'http://localhost:4005/send';
         this.smsUrl = this.config.get('SMS_GATEWAY_URL') || 'http://localhost:4007/send-sms';
@@ -19,12 +25,29 @@ export class JanmasethuDispatchService {
 
     /**
      * Dispatch an outbound message to a patient's preferred channel.
-     * Implements intelligent fallback routing.
+     * Implements intelligent fallback routing and consent enforcement.
      */
     async dispatchResponse(channel: string, userId: string, message: string) {
-        this.logger.log(`Dispatching human response to ${channel} user ${userId}...`);
+        this.logger.log(`Dispatching response to ${channel} user ${userId}...`);
 
         try {
+            // 1. Consent Auto-Check
+            const patient = await this.repository.findDFOPatientByPhone(userId).catch(() => null);
+            if (patient) {
+                const consent = await this.consentService.checkConsent({
+                    patient_id: patient.id,
+                    communication_channel: channel as any,
+                    message_type: 'update',
+                    urgency_level: 'medium',
+                    timestamp: new Date().toISOString()
+                });
+
+                if (!consent.allowed) {
+                    this.logger.warn(`🚫 Dispatch BLOCKED by Consent Engine for patient ${patient.id}: ${consent.reason}`);
+                    return;
+                }
+            }
+
             if (channel === 'whatsapp') {
                 await this.sendWhatsApp(userId, message);
             } else if (channel === 'web') {

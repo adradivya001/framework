@@ -1,11 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { JanmasethuRepository } from '../janmasethu.repository';
+import { JanmasethuDispatchService } from '../channel/janmasethu-dispatch.service';
+import { RealtimeEventsController } from '../api/realtime-events.controller';
 
 @Injectable()
 export class NotificationService {
     private readonly logger = new Logger(NotificationService.name);
 
-    constructor(private readonly repository: JanmasethuRepository) { }
+    constructor(
+        private readonly repository: JanmasethuRepository,
+        private readonly dispatcher: JanmasethuDispatchService,
+    ) { }
 
     /**
      * RESILIENT OMNICHANNEL DISPATCHER
@@ -56,19 +61,32 @@ export class NotificationService {
     }
 
     private async deliverWhatsApp(phone: string, template: string, data: any) {
-        this.logger.log(`MOCK: Sending WhatsApp to ${phone} using Template ${template}`);
-        // Integration point: WhatsApp API bridge
+        this.logger.log(`JanmaSethu: Triggering WhatsApp for ${phone} (Template: ${template})`);
+        // 1. Process template (Mock implementation for now)
+        const content = `[${template}] ${JSON.stringify(data)}`;
+
+        // 2. Dispatch
+        await this.dispatcher.dispatchResponse('whatsapp', phone, content);
         return true;
     }
 
     private async deliverDashboardAlert(userId: string, data: any) {
-        this.logger.log(`MOCK: Pushing real-time alert to Clinician Dashboard for user ${userId}`);
-        // Integration point: Socket.io or Supabase Realtime
+        this.logger.log(`JanmaSethu: Pushing REAL-TIME alert for clinician ${userId}`);
+
+        // Integration point: Real-time broadcast to dashboard users
+        RealtimeEventsController.broadcast('CLINICIAN_NOTIFICATION', {
+            target_user: userId,
+            payload: data,
+            timestamp: new Date()
+        });
+
         return true;
     }
 
     private async deliverSMS(phone: string, data: any) {
-        this.logger.warn(`MOCK: Sending backup SMS alert to ${phone}`);
+        this.logger.warn(`JanmaSethu: Triggering SMS for ${phone}`);
+        const content = `JanmaSethu Alert: ${JSON.stringify(data)}`;
+        await this.dispatcher.dispatchResponse('sms', phone, content);
         return true;
     }
 }

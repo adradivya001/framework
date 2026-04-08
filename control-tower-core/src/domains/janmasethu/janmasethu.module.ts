@@ -41,7 +41,9 @@ import { EmergencyHotlineService } from './utils/emergency-hotline.service';
 import { VitalsModule } from './vitals/vitals.module';
 import { ClinicalIntelligenceModule } from './clinical-intelligence/clinical-intelligence.module';
 import { AlertingModule } from './alerting/alerting.module';
+import { AuthModule } from './auth/auth.module';
 import { ConsentModule } from './consent/consent.module';
+import { JanmasethuRepositoryModule } from './janmasethu-repository.module';
 
 @Module({
     imports: [
@@ -59,11 +61,12 @@ import { ConsentModule } from './consent/consent.module';
         VitalsModule,
         ClinicalIntelligenceModule,
         AlertingModule,
+        AuthModule,
         ConsentModule,
+        JanmasethuRepositoryModule,
     ],
     providers: [
         JanmasethuHandler,
-        JanmasethuRepository,
         JanmasethuPolicy,
         JanmasethuScopePolicy,
         JanmasethuSlaWorker,
@@ -73,7 +76,6 @@ import { ConsentModule } from './consent/consent.module';
         JanmasethuRiskService,
         JanmasethuGuardrailService,
         JanmasethuChannelService,
-        JanmasethuDispatchService,
         JanmasethuSummaryService,
         JanmasethuFeedbackService,
         JanmasethuDFOService,
@@ -95,13 +97,11 @@ import { ConsentModule } from './consent/consent.module';
     ],
     exports: [
         JanmasethuHandler,
-        JanmasethuRepository,
         JanmasethuAssignmentService,
         JanmasethuTakeoverService,
         JanmasethuScopePolicy,
         JanmasethuContextService,
         JanmasethuChannelService,
-        JanmasethuDispatchService,
         JanmasethuSummaryService,
         JanmasethuFeedbackService,
         JanmasethuDFOService,

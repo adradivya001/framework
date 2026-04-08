@@ -1,7 +1,8 @@
 import {
     Controller, Post, Get, Patch, Body, Param, Headers,
-    UnauthorizedException, BadRequestException, Logger
+    UnauthorizedException, BadRequestException, Logger, UseGuards, Request
 } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
 import { JanmasethuHandler } from './janmasethu.handler';
 import { JanmasethuAssignmentService } from './janmasethu.assignment';
@@ -21,6 +22,7 @@ import { JanmasethuAuditService } from './janmasethu.audit.service';
 import { JanmasethuEncryptionService } from './utils/encryption.service';
 import { JanmasethuRbacService } from './janmasethu.rbac';
 import { DocumentService } from './documents/document.service';
+import { ClinicalIntelligenceService } from './clinical-intelligence/clinical-intelligence.service';
 import { JANMASETHU_DOMAIN, JanmasethuUserRole, JanmasethuUserContext, JanmasethuPermission } from './janmasethu.types';
 import { JourneyStage, ConsultationStatus } from './dfo.types';
 import {
@@ -29,6 +31,7 @@ import {
 } from './dto/dfo.dto';
 
 @Controller('janmasethu')
+@UseGuards(JwtAuthGuard)
 export class JanmasethuController {
     private readonly logger = new Logger(JanmasethuController.name);
 
@@ -52,23 +55,17 @@ export class JanmasethuController {
         private readonly encryption: JanmasethuEncryptionService,
         private readonly rbacService: JanmasethuRbacService,
         private readonly documentService: DocumentService,
+        private readonly clinicalIntelligence: ClinicalIntelligenceService,
     ) { }
 
-    private getUserContext(headers: Record<string, any>): JanmasethuUserContext {
-        const userId = headers['x-user-id'];
-        const userRole = headers['x-user-role'] as JanmasethuUserRole;
-
-        if (!userId || !userRole) {
-            throw new UnauthorizedException('Missing user context');
-        }
-
-        return { id: userId, role: userRole };
+    private getUserContext(req: any): JanmasethuUserContext {
+        return req.user;
     }
 
     @Get('reporting/journey/:patient_id')
-    async getJourneyReport(@Param('patient_id') patientId: string, @Headers() headers: any) {
+    async getJourneyReport(@Param('patient_id') patientId: string, @Request() req: any) {
         try {
-            const ctx = this.getUserContext(headers);
+            const ctx = this.getUserContext(req);
             await this.auditService.logPIIAccess(ctx.id, ctx.role, patientId, 'REQUESTED_FULL_JOURNEY_REPORT');
             return await this.reportingService.generateJourneyReport(patientId);
         } catch (error) {
@@ -78,8 +75,8 @@ export class JanmasethuController {
     }
 
     @Get('audit-logs')
-    async getAuditLogs(@Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async getAuditLogs(@Request() req: any) {
+        const ctx = this.getUserContext(req);
         if (ctx.role !== JanmasethuUserRole.CRO) {
             throw new UnauthorizedException('Audit access limited to Clinical Compliance Officers (CRO)');
         }
@@ -94,8 +91,8 @@ export class JanmasethuController {
     }
 
     @Post('appointments')
-    async bookAppointment(@Body() dto: BookAppointmentDto, @Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async bookAppointment(@Body() dto: BookAppointmentDto, @Request() req: any) {
+        const ctx = this.getUserContext(req);
         const appt = await this.dfoService.bookAppointment({
             ...dto,
             appointment_date: new Date(dto.appointment_date)
@@ -107,17 +104,23 @@ export class JanmasethuController {
     // --- DFO CONSULTATIONS & HISTORY ---
 
     @Get('patient/:id/history')
-    async getPatientHistory(@Param('id') id: string, @Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async getPatientHistory(@Param('id') id: string, @Request() req: any) {
+        const ctx = this.getUserContext(req);
         await this.auditService.logPIIAccess(ctx.id, ctx.role, id, 'VIEWED_PATIENT_CLINICAL_HISTORY');
         return this.dfoService.getPatientHistory(id);
     }
 
     @Post('consultations/start')
-    async startConsultation(@Body() dto: StartConsultationDto, @Headers() headers: any) {
+    async startConsultation(@Body() dto: StartConsultationDto, @Request() req: any) {
         try {
-            const user = this.getUserContext(headers);
-            return await this.dfoService.startConsultation(dto.threadId, user.id);
+            const user = this.getUserContext(req);
+            const consultation = await this.dfoService.startConsultation(dto.threadId, user.id);
+
+            // AUTO-TRIGGER: Clinical Intelligence analysis on consultation start
+            this.clinicalIntelligence.analyzeConversation(dto.threadId, user.id)
+                .catch(e => this.logger.warn(`Clinical Analysis auto-trigger failed: ${e.message}`));
+
+            return consultation;
         } catch (error) {
             this.logger.error(`Consultation Start Failure: ${error.message}`);
             throw new BadRequestException(`Clinic Logic Error: ${error.message}`);
@@ -125,13 +128,12 @@ export class JanmasethuController {
     }
 
     @Post('consultations/prescription')
-    async addPrescription(@Body() dto: AddPrescriptionDto, @Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async addPrescription(@Body() dto: AddPrescriptionDto, @Request() req: any) {
+        const ctx = this.getUserContext(req);
         const res = await this.dfoService.addPrescription(dto);
         await this.auditService.logClinicalUpdate(ctx.id, 'PRESCRIPTION_ADDED', dto.consultation_id, { medication: dto.medication_name });
 
         // AUTO-TRIGGER: Queue document generation asynchronously (non-blocking)
-        // The prescription is saved; document generation runs in the background.
         const consultation = await this.repository.findThreadById(dto.consultation_id).catch(() => null);
         const patientId: string = (consultation?.metadata?.patient_id as string) || 'unknown';
 
@@ -147,10 +149,17 @@ export class JanmasethuController {
     }
 
     @Post('consultations/close')
-    async closeConsultation(@Body() dto: CloseConsultationDto, @Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async closeConsultation(@Body() dto: CloseConsultationDto, @Request() req: any) {
+        const ctx = this.getUserContext(req);
         await this.dfoService.closeConsultation(dto.id, dto.notes);
         await this.auditService.logClinicalUpdate(ctx.id, 'CONSULTATION_CLOSED', dto.id, { notes: dto.notes.substring(0, 50) });
+
+        // AUTO-TRIGGER: AI Summary on consultation close
+        const threadId = await this.repository.findThreadByConsultationId(dto.id).catch(() => null);
+        if (threadId) {
+            this.summaryService.generateSummary(threadId).catch(e => this.logger.warn(`AI Summary auto-trigger failed: ${e.message}`));
+        }
+
         return { status: 'closed' };
     }
 
@@ -167,8 +176,8 @@ export class JanmasethuController {
     }
 
     @Get('threads')
-    async listThreads(@Headers() headers: any) {
-        const user = this.getUserContext(headers);
+    async listThreads(@Request() req: any) {
+        const user = this.getUserContext(req);
         return this.repository.findThreads(user);
     }
 
@@ -185,9 +194,12 @@ export class JanmasethuController {
     @Get('context/:id')
     async getThreadContext(
         @Param('id') threadId: string,
-        @Headers() headers: any
+        @Request() req: any
     ) {
-        const user = this.getUserContext(headers);
+        const user = this.getUserContext(req);
+        if (!this.rbacService.canViewThread(user, { id: threadId } as any)) {
+            throw new UnauthorizedException('Access denied to this thread context');
+        }
         return this.contextService.getThreadContext(threadId, user);
     }
 
@@ -197,8 +209,8 @@ export class JanmasethuController {
     }
 
     @Post('feedback')
-    async submitFeedback(@Body() body: any, @Headers() headers: any) {
-        const user = this.getUserContext(headers);
+    async submitFeedback(@Body() body: any, @Request() req: any) {
+        const user = this.getUserContext(req);
         await this.feedbackService.submitFeedback(body.threadId, user, {
             accuracy_score: body.accuracyScore,
             comment: body.comment,
@@ -217,9 +229,9 @@ export class JanmasethuController {
     async assignThread(
         @Param('id') threadId: string,
         @Body() body: any,
-        @Headers() headers: any
+        @Request() req: any
     ) {
-        const user = this.getUserContext(headers);
+        const user = this.getUserContext(req);
         const { targetUserId, targetRole } = body;
         await this.assignmentService.assignThread(threadId, targetUserId, targetRole, user);
         return { status: 'assigned', threadId };
@@ -228,9 +240,9 @@ export class JanmasethuController {
     @Post('take-control/:id')
     async takeControl(
         @Param('id') threadId: string,
-        @Headers() headers: any
+        @Request() req: any
     ) {
-        const user = this.getUserContext(headers);
+        const user = this.getUserContext(req);
         await this.takeoverService.takeControl(threadId, user);
         return { status: 'controlled', threadId };
     }
@@ -239,9 +251,9 @@ export class JanmasethuController {
     async referCase(
         @Param('id') threadId: string,
         @Body() body: { targetDoctorId: string; reason: string },
-        @Headers() headers: any
+        @Request() req: any
     ) {
-        const user = this.getUserContext(headers);
+        const user = this.getUserContext(req);
         if (user.role !== JanmasethuUserRole.DOCTOR) {
             throw new UnauthorizedException('Only DOCTOR roles can issue formal clinical referrals.');
         }
@@ -253,9 +265,9 @@ export class JanmasethuController {
     @Post('reply')
     async handleReply(
         @Body() body: { thread_id: string; sender_type: string; content: string },
-        @Headers() headers: any
+        @Request() req: any
     ) {
-        const user = this.getUserContext(headers);
+        const user = this.getUserContext(req);
 
         // 1. Save message to thread
         await this.threadService.appendMessage(body.thread_id, {
@@ -321,15 +333,21 @@ export class JanmasethuController {
     }
 
     @Post('leads')
-    async createLead(@Body() payload: any, @Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async createLead(@Body() payload: any, @Request() req: any) {
+        const ctx = this.getUserContext(req);
         await this.auditService.logPIIAccess(ctx.id, ctx.role, 'SYSTEM', 'REGISTERED_NEW_LEAD');
         return this.leadsService.createLead(payload);
     }
 
+    @Post('leads/:id/convert')
+    async convertLead(@Param('id') id: string, @Request() req: any) {
+        const ctx = this.getUserContext(req);
+        return this.leadsService.convertLeadToPatient(id, ctx.id);
+    }
+
     @Post('leads/process-stalled')
-    async processStalled(@Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async processStalled(@Request() req: any) {
+        const ctx = this.getUserContext(req);
         if (!this.rbacService.canViewPII(ctx)) {
             throw new BadRequestException('Unauthorized to process clinical funnel.');
         }
@@ -339,8 +357,8 @@ export class JanmasethuController {
     }
 
     @Get('patients')
-    async listPatients(@Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async listPatients(@Request() req: any) {
+        const ctx = this.getUserContext(req);
         if (!this.rbacService.canViewPII(ctx)) {
             throw new BadRequestException('Unauthorized PII Access');
         }
@@ -357,14 +375,38 @@ export class JanmasethuController {
     }
 
     @Get('patients/:id')
-    async getPatient(@Param('id') id: string, @Headers() headers: any) {
-        const ctx = this.getUserContext(headers);
+    async getPatient(@Param('id') id: string, @Request() req: any) {
+        const ctx = this.getUserContext(req);
         await this.auditService.logPIIAccess(ctx.id, ctx.role, id, 'DETAILED_PATIENT_PROFILE_ACCESS');
         return this.dfoService.getPatientProfile(id);
+    }
+
+    @Patch('patients/:id')
+    async updatePatient(@Param('id') id: string, @Body() dto: any, @Request() req: any) {
+        const ctx = this.getUserContext(req);
+        await this.auditService.logClinicalUpdate(ctx.id, 'PATIENT_PROFILE_UPDATED', id, dto);
+        return this.repository.upsertDFOPatient({ ...dto, id });
     }
 
     @Get('clinic-metrics')
     async getClinicalMetrics() {
         return this.dfoService.getClinicalMetrics();
+    }
+
+    @Post('clinical-intelligence/analyze')
+    async analyzeIntelligence(@Body('thread_id') threadId: string, @Request() req: any) {
+        const ctx = this.getUserContext(req);
+
+        // 1. Fetch thread messages
+        const messages = await this.repository.findMessagesByThreadId(threadId);
+        if (!messages || messages.length === 0) {
+            throw new BadRequestException('Thread has no messages to analyze.');
+        }
+
+        // 2. Transcribe messages into a conversation text format
+        const conversationText = messages.map(m => `[${m.sender_type}]: ${m.content}`).join('\n');
+
+        // 3. Send transcript to AI
+        return this.clinicalIntelligence.analyzeConversation(conversationText, ctx.id);
     }
 }
