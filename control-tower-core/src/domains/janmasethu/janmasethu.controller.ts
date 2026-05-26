@@ -1,6 +1,6 @@
 import {
     Controller, Post, Get, Patch, Body, Param, Headers,
-    UnauthorizedException, BadRequestException, Logger, UseGuards, Request
+    UnauthorizedException, BadRequestException, Logger, UseGuards, Request, UseInterceptors
 } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
@@ -30,8 +30,11 @@ import {
     StartConsultationDto, CloseConsultationDto, AddPrescriptionDto
 } from './dto/dfo.dto';
 
+import { JanmasethuResponseInterceptor } from './utils/response.interceptor';
+
 @Controller('janmasethu')
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(JanmasethuResponseInterceptor)
 export class JanmasethuController {
     private readonly logger = new Logger(JanmasethuController.name);
 
@@ -289,7 +292,11 @@ export class JanmasethuController {
         return { status: 'sent', thread_id: body.thread_id };
     }
 
-    // --- APPOINTMENTS (Full Lifecycle) ---
+    @Get('appointments')
+    async listAppointments() {
+        return this.appointmentService.findAll();
+    }
+
     @Get('doctors/:id/slots')
     async getDoctorSlots(@Param('id') doctorId: string) {
         return this.appointmentService.findSlots(doctorId);

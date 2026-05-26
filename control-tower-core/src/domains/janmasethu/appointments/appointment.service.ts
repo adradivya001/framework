@@ -2,6 +2,7 @@ import { Injectable, Logger, BadRequestException, OnModuleInit } from '@nestjs/c
 import { JanmasethuRepository } from '../janmasethu.repository';
 import { AppointmentStatus, DFOAppointment, DFODoctor } from '../dfo.types';
 import { EngagementEngineService } from '../engagement-engine/engine.service';
+import { RealtimeEventsController } from '../api/realtime-events.controller';
 
 @Injectable()
 export class AppointmentService {
@@ -47,6 +48,9 @@ export class AppointmentService {
             patientId: dto.patientId,
             reminderTime
         });
+
+        // 4. REALTIME: Broadcast event for frontend sync
+        RealtimeEventsController.broadcast('APPOINTMENT_BOOKED', appt);
 
         return appt;
     }
@@ -128,5 +132,13 @@ export class AppointmentService {
         this.logger.log(`Marking appointment ${id} as COMPLETED.`);
         await this.repository.updateAppointment(id, { status: AppointmentStatus.COMPLETED });
         await this.engagementEngine.processEvent('APPOINTMENT_COMPLETED', { appointmentId: id });
+        
+        // REALTIME BROADCAST
+        RealtimeEventsController.broadcast('APPOINTMENT_COMPLETED', { id });
+    }
+
+    async findAll(): Promise<any[]> {
+        this.logger.log('Fetching all appointments...');
+        return this.repository.findAllAppointments();
     }
 }

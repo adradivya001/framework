@@ -167,7 +167,11 @@ export class JanmasethuRepository {
         }
 
         const { data, error } = await query.order('created_at', { ascending: false });
-        if (error) throw error;
+        if (error) {
+            this.logger.error(`Failed to fetch patients: ${error.message}`);
+            throw error;
+        }
+        this.logger.log(`Fetched ${data?.length || 0} patients from database.`);
         return (data || []) as DFOPatient[];
     }
 
@@ -299,9 +303,52 @@ export class JanmasethuRepository {
     }
 
     async createAppointment(dto: Partial<DFOAppointment>): Promise<DFOAppointment> {
+        this.logger.log(`Attempting to create appointment for patient: ${dto.patient_id} with doctor: ${dto.doctor_id}`);
         const { data, error } = await this.supabase.from('dfo_appointments').insert([dto]).select().single();
-        if (error) throw error;
+        if (error) {
+            this.logger.error(`Appointment creation failed: ${error.message} | Patient: ${dto.patient_id} | Doctor: ${dto.doctor_id}`);
+            throw error;
+        }
+        this.logger.log(`Successfully created appointment: ${data.id}`);
         return data as DFOAppointment;
+    }
+
+    async findAllAppointments(): Promise<any[]> {
+        const { data, error } = await this.supabase
+            .from('dfo_appointments')
+            .select(`
+                *,
+                patient:dfo_patients!patient_id (full_name, phone_number),
+                doctor:dfo_doctors!doctor_id (full_name, specialization)
+            `)
+            .order('appointment_date', { ascending: true });
+        if (error) throw error;
+        return data || [];
+    }
+
+    async findAllConsultations(): Promise<any[]> {
+        const { data, error } = await this.supabase
+            .from('dfo_consultations')
+            .select(`
+                *,
+                patient:dfo_patients!patient_id (full_name),
+                doctor:dfo_doctors!doctor_id (full_name)
+            `)
+            .order('start_time', { ascending: false });
+        if (error) throw error;
+        return data || [];
+    }
+
+    async findAllRiskLogs(): Promise<any[]> {
+        const { data, error } = await this.supabase
+            .from('dfo_risk_logs')
+            .select(`
+                *,
+                patient:dfo_patients!patient_id (full_name)
+            `)
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data || [];
     }
 
     async startConsultation(dto: Partial<DFOConsultation>): Promise<DFOConsultation> {
@@ -309,7 +356,7 @@ export class JanmasethuRepository {
             patient_id: dto.patient_id,
             doctor_id: dto.doctor_id,
             thread_id: dto.thread_id,
-            // status: dto.status || ConsultationStatus.OPEN, 
+            status: dto.status || ConsultationStatus.OPEN, 
             start_time: dto.start_time || new Date(),
             clinical_notes: dto.clinical_notes || ''
         };
@@ -455,7 +502,7 @@ export class JanmasethuRepository {
 
         const activeConversations = (threads || []).filter(t => t.ownership === 'HUMAN').length;
 
-        this.logger.log(`Analytics refreshed: ${totalPatients} patients, ${activeConversations} active human threads.`);
+        this.logger.log(`📊 Analytics refreshed | Patients: ${totalPatients} | Human Threads: ${activeConversations} | Risk: [R:${riskDistribution.RED} Y:${riskDistribution.YELLOW} G:${riskDistribution.GREEN}]`);
 
         return {
             risk_distribution: riskDistribution,
@@ -693,6 +740,18 @@ export class JanmasethuRepository {
             .single();
         if (error) throw error;
         return data;
+    }
+
+    async findAllEngagementLogs(): Promise<any[]> {
+        const { data, error } = await this.supabase
+            .from('dfo_engagement_logs')
+            .select(`
+                *,
+                patient:dfo_patients!patient_id (full_name)
+            `)
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data || [];
     }
 
     async findThreadByConsultationId(consultationId: string): Promise<string | null> {

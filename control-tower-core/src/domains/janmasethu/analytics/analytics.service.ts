@@ -51,32 +51,45 @@ export class AnalyticsService {
     async recalculateAllMetrics(): Promise<DashboardAnalytics> {
         this.logger.log('📈 Starting full analytics re-computation...');
 
-        const [risk, sla, load, apps] = await Promise.all([
-            this.calculateRiskDistribution(),
-            this.calculateSLABreachRate(),
-            this.calculateClinicianLoad(),
-            this.calculateAppointmentStats()
-        ]);
+        try {
+            const [risk, sla, load, apps] = await Promise.all([
+                this.calculateRiskDistribution().catch(e => ({ RED: 0, YELLOW: 0, GREEN: 0 })),
+                this.calculateSLABreachRate().catch(e => 0),
+                this.calculateClinicianLoad().catch(e => []),
+                this.calculateAppointmentStats().catch(e => ({ completed: 0, no_show: 0, fulfillment_rate: 0 }))
+            ]);
 
-        const dashboardData: DashboardAnalytics = {
-            risk_distribution: risk,
-            sla_breach_rate: sla,
-            clinician_load: load,
-            appointment_stats: apps,
-            updated_at: new Date()
-        };
-
-        // Persist to cache (Upsert)
-        await this.supabase
-            .from('dfo_analytics_cache')
-            .upsert({
-                key: this.CACHE_KEY,
-                value: dashboardData,
+            const dashboardData: DashboardAnalytics = {
+                risk_distribution: risk,
+                sla_breach_rate: sla,
+                clinician_load: load,
+                appointment_stats: apps,
                 updated_at: new Date()
-            });
+            };
 
-        this.logger.log('✅ Dashboard analytics successfully refreshed in cache.');
-        return dashboardData;
+            // Persist to cache (Upsert)
+            const { error } = await this.supabase
+                .from('dfo_analytics_cache')
+                .upsert({
+                    key: this.CACHE_KEY,
+                    value: dashboardData,
+                    updated_at: new Date()
+                });
+
+            if (error) throw error;
+
+            this.logger.log('✅ Dashboard analytics successfully refreshed in cache.');
+            return dashboardData;
+        } catch (error) {
+            this.logger.error(`❌ Analytics recalculation failed: ${error.message}`);
+            return {
+                risk_distribution: { RED: 0, YELLOW: 0, GREEN: 0 },
+                sla_breach_rate: 0,
+                clinician_load: [],
+                appointment_stats: { completed: 0, no_show: 0, fulfillment_rate: 0 },
+                updated_at: new Date()
+            };
+        }
     }
 
     // ============================================================

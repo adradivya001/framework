@@ -16,17 +16,11 @@ The Hybrid Sentiment Detection and Risk Scoring Engine evaluates incoming user m
 3. **Context Extraction (`context-extractor.ts`)**
    Fetches the last 5 messages from the database (`conversation_messages`) to provide historical context. This is useful for detecting repeated distress indicators across multiple consecutive messages.
 
-4. **Transformer-based Intent Analysis (`bert-risk-analyzer.ts`)**
-   Makes an HTTP POST request to a fine-tuned BERT Inference API to semantically classify the user's intent.
-   - Outputs: `HIGH_RISK`, `MODERATE_RISK`, or `LOW_RISK`.
-   - Features a 2-second timeout and assumes `LOW_RISK` if the external API fails or times out.
 
 5. **Risk Scoring Engine (`risk-scoring-engine.ts`)**
    Calculates a final numerical score by weighting each of the individual signals:
    - Emergency Keyword: `+50`
    - Moderate Keyword: `+30`
-   - BERT High-Risk: `+40`
-   - BERT Moderate-Risk: `+20`
    - Negative Sentiment (>20 threshold): `+20`
    - Context Risk Present: `+20`
 

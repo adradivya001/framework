@@ -7,23 +7,6 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function runSQL(sql) {
-    console.log('Running SQL...');
-    const { data, error } = await supabase.rpc('exec_sql', { sql_query: sql });
-    if (error) {
-        console.error('Error running SQL:', error);
-        // Fallback for when exec_sql rpc is not available
-        console.log('Falling back to direct table creation attempts...');
-        // This is a bit limited in supabase-js, normally you'd use migrate or raw POST to /rest/v1/rpc/query
-    } else {
-        console.log('SQL applied successfully.');
-    }
-}
-
-// Since I can't easily run arbitrary SQL via supabase-js without an RPC, 
-// I'll try to check if the tables exist by querying them.
-// If I can't run the SQL, I'll provide the SQL to the user to run in the Supabase Dashboard.
-
 async function checkTables() {
     const tables = [
         'conversation_threads',
@@ -43,15 +26,22 @@ async function checkTables() {
         'routing_events'
     ];
 
-    console.log('Checking for required tables...');
+    console.log('Checking for required tables and data...');
     for (const table of tables) {
-        const { error } = await supabase.from(table).select('count', { count: 'exact', head: true }).limit(1);
+        const { count, error } = await supabase.from(table).select('*', { count: 'exact', head: true });
         if (error) {
-            console.log(`Table '${table}' might be missing: ${error.message}`);
+            console.log(`❌ Table '${table}' error: ${error.message}`);
         } else {
-            console.log(`Table '${table}' exists.`);
+            console.log(`✅ Table '${table}' exists. Rows: ${count}`);
         }
     }
+
+    console.log('\n--- Sample Data Verification ---');
+    const { data: appData } = await supabase.from('dfo_appointments').select('*').limit(1);
+    console.log('Sample Appointment:', JSON.stringify(appData?.[0], null, 2));
+
+    const { data: conData } = await supabase.from('dfo_consultations').select('*').limit(1);
+    console.log('Sample Consultation:', JSON.stringify(conData?.[0], null, 2));
 }
 
 checkTables();

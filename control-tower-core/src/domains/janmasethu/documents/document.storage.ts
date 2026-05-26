@@ -1,7 +1,7 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-const STORAGE_BUCKET = 'documents';
+const STORAGE_BUCKET = 'document';
 const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour
 
 /**

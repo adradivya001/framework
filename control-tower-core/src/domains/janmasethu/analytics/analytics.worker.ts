@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Processor, WorkerHost, InjectQueue } from '@nestjs/bullmq';
 import { Job, Queue } from 'bullmq';
 import { AnalyticsService } from './analytics.service';
+import { RealtimeEventsController } from '../api/realtime-events.controller';
 
 /**
  * AnalyticsWorker
@@ -44,6 +45,9 @@ export class AnalyticsWorker extends WorkerHost implements OnModuleInit {
 
         try {
             const stats = await this.analyticsService.recalculateAllMetrics();
+
+            // BROADCAST: Update frontend dashboards in realtime
+            RealtimeEventsController.broadcast('ANALYTICS_UPDATED', stats);
 
             this.logger.log(
                 `💾 Dashboard Refresh Success | Threads: ${Object.values(stats.risk_distribution).reduce((a, b) => a + b, 0)}`

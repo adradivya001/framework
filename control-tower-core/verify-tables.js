@@ -67,6 +67,29 @@ async function verifyTables() {
         if (e3) throw new Error(`Workload RPC failed: ${e3.message}`);
         console.log('✅ dfo_clinician_workload (RPC): Success');
 
+        // 5. Test: dfo_support_tickets (CREATE, READ, UPDATE, DELETE)
+        const { data: ticket, error: e4 } = await supabase.from('dfo_support_tickets').insert([{
+            thread_id: threadId,
+            category: 'Emotional Support',
+            priority: 'HIGH',
+            status: 'OPEN',
+            patient_name: 'Jane Doe',
+            patient_phone: '+123456789'
+        }]).select().single();
+        if (e4) throw new Error(`dfo_support_tickets creation failed: ${e4.message}`);
+        console.log(`✅ dfo_support_tickets: CREATE Success (id: ${ticket.id})`);
+
+        const { error: e5 } = await supabase.from('dfo_support_tickets').update({
+            status: 'IN_PROGRESS',
+            priority: 'CRITICAL'
+        }).eq('id', ticket.id);
+        if (e5) throw new Error(`dfo_support_tickets update failed: ${e5.message}`);
+        console.log('✅ dfo_support_tickets: UPDATE Success');
+
+        const { error: e6 } = await supabase.from('dfo_support_tickets').delete().eq('id', ticket.id);
+        if (e6) throw new Error(`dfo_support_tickets delete failed: ${e6.message}`);
+        console.log('✅ dfo_support_tickets: DELETE Success');
+
         console.log('\n🌟 ALL TABLES VERIFIED. Backend infrastructure is operational.');
 
     } catch (err) {

@@ -1,11 +1,9 @@
 import { RiskLevel } from './keyword-detector';
-import { BertRiskLevel } from './bert-risk-analyzer';
 
 export class RiskScoringEngine {
     calculateScore(signals: {
         keywordLevel: RiskLevel;
         sentimentScore: number;
-        bertLevel: BertRiskLevel;
         contextRisk?: boolean;
     }): number {
         let totalScore = 0;
@@ -17,11 +15,7 @@ export class RiskScoringEngine {
         // 2. Sentiment Signal (threshold based)
         if (signals.sentimentScore > 20) totalScore += 20;
 
-        // 3. BERT Signal
-        if (signals.bertLevel === BertRiskLevel.HIGH_RISK) totalScore += 40;
-        else if (signals.bertLevel === BertRiskLevel.MODERATE_RISK) totalScore += 20;
-
-        // 4. Context Signal
+        // 3. Context Signal
         if (signals.contextRisk) totalScore += 20;
 
         return totalScore;

@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { HealthcareExceptionFilter } from './infrastructure/filters/healthcare-exception.filter';
+import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 
 async function bootstrap() {
@@ -25,7 +26,9 @@ async function bootstrap() {
     errorHttpStatusCode: 422, // Unprocessable Entity
   }));
 
-  const port = process.env.PORT || 3000;
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('PORT') || 3000;
+  
   await app.listen(port);
   console.log(`[Janmasethu DFO] Control Tower Core is running on: http://localhost:${port}`);
 }

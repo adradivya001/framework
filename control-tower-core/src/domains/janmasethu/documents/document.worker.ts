@@ -31,7 +31,8 @@ export class DocumentWorker extends WorkerHost {
         );
 
         try {
-            await this.documentService.executeGeneration(job.data);
+            // Using the new HTML-to-PDF pipeline as requested
+            await this.documentService.executePdfGeneration(job.data);
 
             this.logger.log(
                 `✅ Document Job Completed | Prescription: ${prescription_id} | Patient: ${patient_id}`

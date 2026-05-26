@@ -18,68 +18,10 @@ export class JanmasethuDFOService implements OnModuleInit {
         private readonly repository: JanmasethuRepository,
         private readonly engagementService: EngagementService,
         private readonly encryption: JanmasethuEncryptionService,
-        // @InjectQueue('appointment_checker') private readonly checkerQueue: Queue
     ) { }
 
     async onModuleInit() {
-        this.logger.log('DFO Clinical Engine: Checking for seed data...');
-        try {
-            // 1. AUTO-SEED DOCTORS (MULTI-PROFILE)
-            const doctors = await this.repository.findDoctorAvailability();
-            if (doctors.length <= 1) {
-                this.logger.log('SEEDING CLINIC WORKFORCE...');
-                await this.repository.upsertDoctor({
-                    id: '550e8400-e29b-41d4-a716-446655440001',
-                    full_name: 'Dr. Divya Sharma',
-                    specialization: ['Clinical Lead', 'General Practitioner'],
-                    is_available: true
-                });
-                await this.repository.upsertDoctor({
-                    id: '550e8400-e29b-41d4-a716-446655440002',
-                    full_name: 'Dr. Sarah Smith',
-                    specialization: ['Obstetrics & Gynecology'],
-                    is_available: true
-                });
-                await this.repository.upsertDoctor({
-                    id: '550e8400-e29b-41d4-a716-556655440003',
-                    full_name: 'Dr. Rahul Kumar',
-                    specialization: ['IVF Specialist'],
-                    is_available: true
-                });
-            }
-
-            // 2. AUTO-SEED SLOTS & APPOINTMENTS (MULTI-PROFILE LOAD)
-            const pts = await this.repository.findAllPatients();
-            const apps = await this.repository.findPastDueAppointments(new Date(Date.now() + 1000000000));
-            if (apps.length <= 1 && pts.length > 0) {
-                this.logger.log('SEEDING MULTI-PROFILE APPOINTMENTS...');
-                await this.repository.createAppointment({ patient_id: '550e8400-e29b-41d4-a716-44665544a001', doctor_id: '550e8400-e29b-41d4-a716-446655440001', appointment_date: new Date(), status: AppointmentStatus.SCHEDULED });
-                await this.repository.createAppointment({ patient_id: '550e8400-e29b-41d4-a716-44665544a002', doctor_id: '550e8400-e29b-41d4-a716-446655440002', appointment_date: new Date(), status: AppointmentStatus.SCHEDULED });
-                await this.repository.createAppointment({ patient_id: '550e8400-e29b-41d4-a716-556655440003', doctor_id: '550e8400-e29b-41d4-a716-556655440003', appointment_date: new Date(), status: AppointmentStatus.SCHEDULED });
-            }
-
-            // 3. AUTO-SEED PATIENTS (MOCK COHORT)
-            if (pts.length === 0) {
-                this.logger.log('NO PATIENTS FOUND. Seeding "Sara Johnson", "Priya Nair", "Anita Das"...');
-                await this.repository.upsertDFOPatient({ id: '550e8400-e29b-41d4-a716-44665544a001', full_name: 'Sara Johnson', phone_number: '+919900112233', journey_stage: JourneyStage.TRYING_TO_CONCEIVE });
-                await this.repository.upsertDFOPatient({ id: '550e8400-e29b-41d4-a716-44665544a002', full_name: 'Priya Nair', phone_number: '+919900112234', journey_stage: JourneyStage.PREGNANT });
-                await this.repository.upsertDFOPatient({ id: '550e8400-e29b-41d4-a716-44665544a003', full_name: 'Anita Das', phone_number: '+919900112235', journey_stage: JourneyStage.POSTPARTUM });
-            }
-
-            // 4. AUTO-SEED AUDIT LOGS
-            const logs = await this.repository.findAuditLogs();
-            if (logs.length === 0) {
-                this.logger.log('CLEAN AUDIT. Seeding Compliance Ledger...');
-                await this.repository.insertAuditLog({ actor_id: 'DR_DIVYA_001', actor_type: 'DOCTOR', action: 'SECURE_PII_ACCESS', payload: { module: 'PATIENTS' } });
-                await this.repository.insertAuditLog({ actor_id: 'DR_DIVYA_001', actor_type: 'DOCTOR', action: 'LOGIN_SUCCESS', payload: { ip: '127.0.0.1' } });
-                await this.repository.insertAuditLog({ actor_id: 'SYSTEM_AI', actor_type: 'AI', action: 'SENTIMENT_ALERT_TRIGGERED', payload: { thread: 'TX-92' } });
-            }
-
-            this.logger.log('CONTROL TOWER: Mission Readiness Seeding Complete.');
-
-        } catch (error) {
-            this.logger.error(`DFO Startup Failure: ${error.message}`);
-        }
+        this.logger.log('DFO Clinical Engine initialized (Seeding handled by Maintenance Engine).');
     }
 
     /**

@@ -4,7 +4,6 @@ import { JanmasethuRepository } from '../janmasethu.repository';
 import { KeywordDetector, RiskLevel } from './keyword-detector';
 import { SentimentAnalyzer } from './sentiment-analyzer';
 import { ContextExtractor } from './context-extractor';
-import { BertRiskAnalyzer, BertRiskLevel } from './bert-risk-analyzer';
 import { RiskScoringEngine } from './risk-scoring-engine';
 import { RiskClassifier } from './risk-classifier';
 
@@ -16,7 +15,6 @@ export class JanmasethuRiskService implements SentimentProvider {
     private readonly keywordDetector = new KeywordDetector();
     private readonly sentimentAnalyzer = new SentimentAnalyzer();
     private readonly contextExtractor: ContextExtractor;
-    private readonly bertAnalyzer = new BertRiskAnalyzer();
     private readonly scoringEngine = new RiskScoringEngine();
     private readonly classifier = new RiskClassifier();
 
@@ -36,10 +34,7 @@ export class JanmasethuRiskService implements SentimentProvider {
         // 2. Sentiment Analysis
         const sentimentScore = this.sentimentAnalyzer.analyze(text);
 
-        // 3. BERT Risk Analysis
-        const bertLevel = await this.bertAnalyzer.analyze(text);
-
-        // 4. Context Extraction & History
+        // 3. Context Extraction & History
         let contextRisk = false;
         if (options?.threadId) {
             const context = await this.contextExtractor.extract(options.threadId);
@@ -73,7 +68,6 @@ export class JanmasethuRiskService implements SentimentProvider {
         let finalScore = this.scoringEngine.calculateScore({
             keywordLevel,
             sentimentScore,
-            bertLevel,
             contextRisk,
         });
 
@@ -92,7 +86,6 @@ export class JanmasethuRiskService implements SentimentProvider {
                 reasoning,
                 signals: {
                     keyword: keywordLevel === RiskLevel.RED ? 100 : keywordLevel === RiskLevel.YELLOW ? 50 : 0,
-                    bert: bertLevel === BertRiskLevel.HIGH_RISK ? 100 : bertLevel === BertRiskLevel.MODERATE_RISK ? 50 : 0,
                     sentiment: sentimentScore * 100
                 }
             });

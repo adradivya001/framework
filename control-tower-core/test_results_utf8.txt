@@ -1,0 +1,2014 @@
+﻿
+> control-tower-core@0.0.1 test
+> jest
+
+node.exe : FAIL src/domains/janmasethu/janmasethu.audit.service.spec.ts
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL src/domain...service.spec.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  ΓùÅ JanmasethuAuditService ΓÇ║ should log PII access for a patient
+
+    TypeError: Cannot read properties of undefined (reading 'append')
+
+    [0m [90m 28 |[39m         [36mthis[39m[33m.[39mlogger[33m.[39mwarn([32m`AUDIT: [${actorType}] ${actorId} 
+accessed PII for patient ${patientId}. Reason: ${reason}`[39m)[33m;[39m
+     [90m 29 |[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         [36mawait[39m [36mthis[39m[33m.[39mkernelAudit[33m.[39mappend({
+     [90m    |[39m                                [31m[1m^[22m[39m
+     [90m 31 |[39m             actor_id[33m:[39m actorId[33m,[39m
+     [90m 32 |[39m             actor_type[33m:[39m [32m'HUMAN'[39m[33m,[39m
+     [90m 33 |[39m             event_type[33m:[39m [32m'PII_ACCESS'[39m[33m,[39m[0m
+
+      at JanmasethuAuditService.logPIIAccess (domains/janmasethu/janmasethu.audit.service.ts:30:32)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.audit.service.spec.ts:17:23)
+
+  ΓùÅ JanmasethuAuditService ΓÇ║ should log a medical record update
+
+    TypeError: Cannot read properties of undefined (reading 'append')
+
+    [0m [90m 42 |[39m         [36mthis[39m[33m.[39mlogger[33m.[39mlog([32m`AUDIT: Clinical update for 
+patient ${patientId} by ${actorId}: ${action}`[39m)[33m;[39m
+     [90m 43 |[39m
+    [31m[1m>[22m[39m[90m 44 |[39m         [36mawait[39m [36mthis[39m[33m.[39mkernelAudit[33m.[39mappend({
+     [90m    |[39m                                [31m[1m^[22m[39m
+     [90m 45 |[39m             actor_id[33m:[39m actorId[33m,[39m
+     [90m 46 |[39m             actor_type[33m:[39m [32m'HUMAN'[39m[33m,[39m
+     [90m 47 |[39m             event_type[33m:[39m [32m'CLINICAL_UPDATE'[39m[33m,[39m[0m
+
+      at JanmasethuAuditService.logClinicalUpdate (domains/janmasethu/janmasethu.audit.service.ts:44:32)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.audit.service.spec.ts:27:23)
+
+  ΓùÅ JanmasethuAuditService ΓÇ║ should fetch the permanent audit ledger
+
+    TypeError: Cannot read properties of undefined (reading 'getAll')
+
+    [0m [90m 54 |[39m [90m     */[39m
+     [90m 55 |[39m     [36masync[39m getAuditHistory(limit[33m:[39m number [33m=[39m [35m100[39m) {
+    [31m[1m>[22m[39m[90m 56 |[39m         [36mreturn[39m 
+[36mthis[39m[33m.[39mkernelAudit[33m.[39mgetAll()[33m;[39m
+     [90m    |[39m                                 [31m[1m^[22m[39m
+     [90m 57 |[39m     }
+     [90m 58 |[39m }
+     [90m 59 |[39m[0m
+
+      at JanmasethuAuditService.getAuditHistory (domains/janmasethu/janmasethu.audit.service.ts:56:33)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.audit.service.spec.ts:37:23)
+
+[33m[Nest] 33732  - [39m22/05/2026, 3:21:39 pm [33m   WARN[39m [38;5;3m[JanmasethuAuditService] [39m[33mAUDIT: [DOCTOR] DR_DIVYA accessed PII for patient p123. Reason: REPORT_VIEW[39m
+[32m[Nest] 33732  - [39m22/05/2026, 3:21:39 pm [32m    LOG[39m [38;5;3m[JanmasethuAuditService] [39m[32mAUDIT: Clinical update for patient p123 by DR_DIVYA: PRESCRIPTION_ADDED[39m
+FAIL src/domains/janmasethu/janmasethu.sla.spec.ts
+  ΓùÅ JanmasethuSlaWorker (Unit Test) ΓÇ║ Feature: SLA Scheduling ΓÇ║ should schedule a RED SLA with a 5-minute delay
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "check_sla", ObjectContaining {"category": "red", "threadId": "thread-1"}, ObjectContaining {"delay": 
+300000}
+    Received: "check_sla", {"category": "red", "role": "NURSE", "threadId": "thread-1"}, {"attempts": 3, "backoff": 
+{"delay": 10000, "type": "exponential"}, "delay": 180000, "jobId": "thread-1", "removeOnComplete": true}
+
+    Number of calls: 1
+
+    [0m [90m 49 |[39m             [36mawait[39m worker[33m.[39mscheduleSla([32m'thread-1'[39m[33m,[39m 
+[32m'red'[39m)[33m;[39m
+     [90m 50 |[39m
+    [31m[1m>[22m[39m[90m 51 |[39m             expect(mockQueue[33m.[39madd)[33m.[39mtoHaveBeenCalledWith(
+     [90m    |[39m                                   [31m[1m^[22m[39m
+     [90m 52 |[39m                 [32m'check_sla'[39m[33m,[39m
+     [90m 53 |[39m                 expect[33m.[39mobjectContaining({ threadId[33m:[39m 
+[32m'thread-1'[39m[33m,[39m category[33m:[39m [32m'red'[39m })[33m,[39m
+     [90m 54 |[39m                 expect[33m.[39mobjectContaining({ delay[33m:[39m [35m5[39m [33m*[39m 
+[35m60[39m [33m*[39m [35m1000[39m })[0m
+
+      at Object.<anonymous> (domains/janmasethu/janmasethu.sla.spec.ts:51:35)
+
+  ΓùÅ JanmasethuSlaWorker (Unit Test) ΓÇ║ Feature: SLA Scheduling ΓÇ║ should schedule a YELLOW SLA with a 30-minute 
+delay
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "check_sla", ObjectContaining {"category": "yellow", "threadId": "thread-1"}, ObjectContaining {"delay": 
+1800000}
+    Received: "check_sla", {"category": "yellow", "role": "NURSE", "threadId": "thread-1"}, {"attempts": 3, "backoff": 
+{"delay": 10000, "type": "exponential"}, "delay": 600000, "jobId": "thread-1", "removeOnComplete": true}
+
+    Number of calls: 1
+
+    [0m [90m 59 |[39m             [36mawait[39m worker[33m.[39mscheduleSla([32m'thread-1'[39m[33m,[39m 
+[32m'yellow'[39m)[33m;[39m
+     [90m 60 |[39m
+    [31m[1m>[22m[39m[90m 61 |[39m             expect(mockQueue[33m.[39madd)[33m.[39mtoHaveBeenCalledWith(
+     [90m    |[39m                                   [31m[1m^[22m[39m
+     [90m 62 |[39m                 [32m'check_sla'[39m[33m,[39m
+     [90m 63 |[39m                 expect[33m.[39mobjectContaining({ threadId[33m:[39m 
+[32m'thread-1'[39m[33m,[39m category[33m:[39m [32m'yellow'[39m })[33m,[39m
+     [90m 64 |[39m                 expect[33m.[39mobjectContaining({ delay[33m:[39m [35m30[39m [33m*[39m 
+[35m60[39m [33m*[39m [35m1000[39m })[0m
+
+      at Object.<anonymous> (domains/janmasethu/janmasethu.sla.spec.ts:61:35)
+
+  ΓùÅ JanmasethuSlaWorker (Unit Test) ΓÇ║ Feature: SLA Breach Detection ΓÇ║ should detect a breach and revert to 
+DOCTOR_QUEUE if thread is still RED and assigned
+
+    TypeError: this.repository.findLatestMessageByThread is not a function
+
+    [0m [90m 72 |[39m         [36mif[39m (isStillInRisk [33m&&[39m (isStillAssignedToSameRole [33m||[39m 
+isHumanLocked)) {
+     [90m 73 |[39m             [90m// Check if there was a recent human message after the SLA was scheduled[39m
+    [31m[1m>[22m[39m[90m 74 |[39m             [36mconst[39m lastMessage [33m=[39m [36mawait[39m 
+[36mthis[39m[33m.[39mrepository[33m.[39mfindLatestMessageByThread(threadId)[33m;[39m
+     [90m    |[39m                                                       [31m[1m^[22m[39m
+     [90m 75 |[39m             [36mif[39m (lastMessage [33m&&[39m 
+lastMessage[33m.[39mcreated_at[33m.[39mgetTime() [33m>[39m job[33m.[39mtimestamp) {
+     [90m 76 |[39m                 [36mthis[39m[33m.[39mlogger[33m.[39mlog([32m`SLA safe: Human responded to 
+${threadId} since scheduling.`[39m)[33m;[39m
+     [90m 77 |[39m                 [36mreturn[39m[33m;[39m[0m
+
+      at JanmasethuSlaWorker.process (domains/janmasethu/janmasethu.sla.ts:74:55)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.sla.spec.ts:81:13)
+
+FAIL src/domains/janmasethu/channel/janmasethu-dispatch.service.spec.ts
+  ΓùÅ JanmasethuDispatchService ΓÇ║ should be defined
+
+    Nest can't resolve dependencies of the JanmasethuDispatchService (ConfigService, ?, JanmasethuRepository). Please 
+make sure that the argument ConsentEnforcementService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ConsentEnforcementService is a provider, is it part of the current RootTestModule?
+    - If ConsentEnforcementService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ConsentEnforcementService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 20 |[39m
+     [90m 21 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 22 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 23 |[39m             providers[33m:[39m [
+     [90m 24 |[39m                 [33mJanmasethuDispatchService[39m[33m,[39m
+     [90m 25 |[39m                 { provide[33m:[39m [33mConfigService[39m[33m,[39m useValue[33m:[39m 
+mockConfigService }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/channel/janmasethu-dispatch.service.spec.ts:22:39)
+
+  ΓùÅ JanmasethuDispatchService ΓÇ║ should route to whatsapp successfully
+
+    Nest can't resolve dependencies of the JanmasethuDispatchService (ConfigService, ?, JanmasethuRepository). Please 
+make sure that the argument ConsentEnforcementService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ConsentEnforcementService is a provider, is it part of the current RootTestModule?
+    - If ConsentEnforcementService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ConsentEnforcementService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 20 |[39m
+     [90m 21 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 22 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 23 |[39m             providers[33m:[39m [
+     [90m 24 |[39m                 [33mJanmasethuDispatchService[39m[33m,[39m
+     [90m 25 |[39m                 { provide[33m:[39m [33mConfigService[39m[33m,[39m useValue[33m:[39m 
+mockConfigService }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/channel/janmasethu-dispatch.service.spec.ts:22:39)
+
+  ΓùÅ JanmasethuDispatchService ΓÇ║ should fallback to SMS automatically if whatsapp throws an error
+
+    Nest can't resolve dependencies of the JanmasethuDispatchService (ConfigService, ?, JanmasethuRepository). Please 
+make sure that the argument ConsentEnforcementService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ConsentEnforcementService is a provider, is it part of the current RootTestModule?
+    - If ConsentEnforcementService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ConsentEnforcementService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 20 |[39m
+     [90m 21 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 22 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 23 |[39m             providers[33m:[39m [
+     [90m 24 |[39m                 [33mJanmasethuDispatchService[39m[33m,[39m
+     [90m 25 |[39m                 { provide[33m:[39m [33mConfigService[39m[33m,[39m useValue[33m:[39m 
+mockConfigService }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/channel/janmasethu-dispatch.service.spec.ts:22:39)
+
+FAIL src/domains/janmasethu/notifications/notification.service.spec.ts
+  ΓùÅ NotificationService ΓÇ║ should send a dashboard alert and log it for clinicians
+
+    Nest can't resolve dependencies of the NotificationService (JanmasethuRepository, ?). Please make sure that the 
+argument JanmasethuDispatchService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 16 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 17 |[39m             providers[33m:[39m [
+     [90m 18 |[39m                 [33mNotificationService[39m[33m,[39m
+     [90m 19 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/notifications/notification.service.spec.ts:16:39)
+
+  ΓùÅ NotificationService ΓÇ║ should mock WhatsApp delivery and log it
+
+    Nest can't resolve dependencies of the NotificationService (JanmasethuRepository, ?). Please make sure that the 
+argument JanmasethuDispatchService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 16 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 17 |[39m             providers[33m:[39m [
+     [90m 18 |[39m                 [33mNotificationService[39m[33m,[39m
+     [90m 19 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/notifications/notification.service.spec.ts:16:39)
+
+FAIL src/domains/janmasethu/analytics/analytics.service.spec.ts
+  ΓùÅ AnalyticsService ΓÇ║ should be defined
+
+    Nest can't resolve dependencies of the AnalyticsService (?). Please make sure that the argument "SUPABASE_CLIENT" 
+at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "SUPABASE_CLIENT" is a provider, is it part of the current RootTestModule?
+    - If "SUPABASE_CLIENT" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "SUPABASE_CLIENT" */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 28 |[39m             providers[33m:[39m [
+     [90m 29 |[39m                 [33mAnalyticsService[39m[33m,[39m
+     [90m 30 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepo }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/analytics/analytics.service.spec.ts:27:39)
+
+  ΓùÅ AnalyticsService ΓÇ║ should return cached metrics natively without DB sweep
+
+    Nest can't resolve dependencies of the AnalyticsService (?). Please make sure that the argument "SUPABASE_CLIENT" 
+at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "SUPABASE_CLIENT" is a provider, is it part of the current RootTestModule?
+    - If "SUPABASE_CLIENT" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "SUPABASE_CLIENT" */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 28 |[39m             providers[33m:[39m [
+     [90m 29 |[39m                 [33mAnalyticsService[39m[33m,[39m
+     [90m 30 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepo }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/analytics/analytics.service.spec.ts:27:39)
+
+  ΓùÅ AnalyticsService ΓÇ║ should calculate metrics when cache is empty
+
+    Nest can't resolve dependencies of the AnalyticsService (?). Please make sure that the argument "SUPABASE_CLIENT" 
+at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "SUPABASE_CLIENT" is a provider, is it part of the current RootTestModule?
+    - If "SUPABASE_CLIENT" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "SUPABASE_CLIENT" */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 28 |[39m             providers[33m:[39m [
+     [90m 29 |[39m                 [33mAnalyticsService[39m[33m,[39m
+     [90m 30 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepo }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/analytics/analytics.service.spec.ts:27:39)
+
+FAIL src/domains/janmasethu/janmasethu.leads.service.spec.ts
+  ΓùÅ JanmasethuLeadsService (Encryption & Funnel) ΓÇ║ should encrypt sensitive medical fields before saving to 
+database
+
+    Nest can't resolve dependencies of the JanmasethuLeadsService (JanmasethuRepository, JanmasethuEncryptionService, 
+?). Please make sure that the argument JanmasethuDispatchService at index [2] is available in the RootTestModule 
+context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 19 |[39m
+     [90m 20 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 21 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 22 |[39m             providers[33m:[39m [
+     [90m 23 |[39m                 [33mJanmasethuLeadsService[39m[33m,[39m
+     [90m 24 |[39m                 {[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.leads.service.spec.ts:21:39)
+
+  ΓùÅ JanmasethuLeadsService (Encryption & Funnel) ΓÇ║ should decrypt sensitive fields when fetching from dashboard
+
+    Nest can't resolve dependencies of the JanmasethuLeadsService (JanmasethuRepository, JanmasethuEncryptionService, 
+?). Please make sure that the argument JanmasethuDispatchService at index [2] is available in the RootTestModule 
+context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 19 |[39m
+     [90m 20 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 21 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 22 |[39m             providers[33m:[39m [
+     [90m 23 |[39m                 [33mJanmasethuLeadsService[39m[33m,[39m
+     [90m 24 |[39m                 {[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.leads.service.spec.ts:21:39)
+
+  ΓùÅ JanmasethuLeadsService (Encryption & Funnel) ΓÇ║ should identify and nudge stalled leads in the funnel
+
+    Nest can't resolve dependencies of the JanmasethuLeadsService (JanmasethuRepository, JanmasethuEncryptionService, 
+?). Please make sure that the argument JanmasethuDispatchService at index [2] is available in the RootTestModule 
+context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 19 |[39m
+     [90m 20 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 21 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 22 |[39m             providers[33m:[39m [
+     [90m 23 |[39m                 [33mJanmasethuLeadsService[39m[33m,[39m
+     [90m 24 |[39m                 {[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.leads.service.spec.ts:21:39)
+
+PASS src/domains/janmasethu/alerting/alerting.service.spec.ts
+FAIL src/domains/janmasethu/engagement/engagement.service.spec.ts (5.106 s)
+  ΓùÅ EngagementService ΓÇ║ should prevent scheduling staged messages if consent is denied
+
+    TypeError: this.supabase.from(...).select(...).eq(...).eq(...).ilike is not a function
+
+    [0m [90m 34 |[39m             [33m.[39meq([32m'journey_stage'[39m[33m,[39m stage)
+     [90m 35 |[39m             [33m.[39meq([32m'trigger_type'[39m[33m,[39m [32m'STAGED'[39m)
+    [31m[1m>[22m[39m[90m 36 |[39m             [33m.[39milike([32m'template_key'[39m[33m,[39m 
+[32m`%W${week}%`[39m)
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 37 |[39m             [33m.[39msingle()[33m;[39m
+     [90m 38 |[39m
+     [90m 39 |[39m         [36mif[39m (template) {[0m
+
+      at EngagementService.scheduleStagedMessage (domains/janmasethu/engagement/engagement.service.ts:36:14)
+      at Object.<anonymous> (domains/janmasethu/engagement/engagement.service.spec.ts:54:23)
+
+FAIL src/domains/janmasethu/janmasethu.dfo.service.spec.ts (5.225 s)
+  ΓùÅ JanmasethuDFOService ΓÇ║ should correctly register or update a patient
+
+    Nest can't resolve dependencies of the JanmasethuDFOService (JanmasethuRepository, EngagementService, ?). Please 
+make sure that the argument JanmasethuEncryptionService at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuEncryptionService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuEncryptionService is exported from a separate @Module, is that module imported within 
+RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuEncryptionService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 33 |[39m
+     [90m 34 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 35 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 36 |[39m             providers[33m:[39m [
+     [90m 37 |[39m                 [33mJanmasethuDFOService[39m[33m,[39m
+     [90m 38 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.dfo.service.spec.ts:35:39)
+
+  ΓùÅ JanmasethuDFOService ΓÇ║ should start a consultation for a valid patient
+
+    Nest can't resolve dependencies of the JanmasethuDFOService (JanmasethuRepository, EngagementService, ?). Please 
+make sure that the argument JanmasethuEncryptionService at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuEncryptionService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuEncryptionService is exported from a separate @Module, is that module imported within 
+RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuEncryptionService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 33 |[39m
+     [90m 34 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 35 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 36 |[39m             providers[33m:[39m [
+     [90m 37 |[39m                 [33mJanmasethuDFOService[39m[33m,[39m
+     [90m 38 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.dfo.service.spec.ts:35:39)
+
+FAIL src/domains/janmasethu/janmasethu.handler.spec.ts (5.763 s)
+  ΓùÅ JanmasethuHandler (Unit Test) ΓÇ║ should be defined
+
+    Nest can't resolve dependencies of the JanmasethuHandler (JanmasethuRepository, JanmasethuScopePolicy, ?, 
+SentimentService, RoutingService, EngagementEngineService, JanmasethuGuardrailService, EmergencyHotlineService). 
+Please make sure that the argument JanmasethuSlaWorker at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuSlaWorker is a provider, is it part of the current RootTestModule?
+    - If JanmasethuSlaWorker is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuSlaWorker */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 32 |[39m             providers[33m:[39m [
+     [90m 33 |[39m                 [33mJanmasethuHandler[39m[33m,[39m
+     [90m 34 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.handler.spec.ts:31:39)
+
+  ΓùÅ JanmasethuHandler (Unit Test) ΓÇ║ Identity Resolution ΓÇ║ should auto-register a new patient if they do not exist
+
+    Nest can't resolve dependencies of the JanmasethuHandler (JanmasethuRepository, JanmasethuScopePolicy, ?, 
+SentimentService, RoutingService, EngagementEngineService, JanmasethuGuardrailService, EmergencyHotlineService). 
+Please make sure that the argument JanmasethuSlaWorker at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuSlaWorker is a provider, is it part of the current RootTestModule?
+    - If JanmasethuSlaWorker is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuSlaWorker */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 32 |[39m             providers[33m:[39m [
+     [90m 33 |[39m                 [33mJanmasethuHandler[39m[33m,[39m
+     [90m 34 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.handler.spec.ts:31:39)
+
+  ΓùÅ JanmasethuHandler (Unit Test) ΓÇ║ Idempotency ΓÇ║ should skip processing if message_id already exists
+
+    Nest can't resolve dependencies of the JanmasethuHandler (JanmasethuRepository, JanmasethuScopePolicy, ?, 
+SentimentService, RoutingService, EngagementEngineService, JanmasethuGuardrailService, EmergencyHotlineService). 
+Please make sure that the argument JanmasethuSlaWorker at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuSlaWorker is a provider, is it part of the current RootTestModule?
+    - If JanmasethuSlaWorker is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuSlaWorker */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 32 |[39m             providers[33m:[39m [
+     [90m 33 |[39m                 [33mJanmasethuHandler[39m[33m,[39m
+     [90m 34 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.handler.spec.ts:31:39)
+
+  ΓùÅ JanmasethuHandler (Unit Test) ΓÇ║ Thread Linkage & Metadata ΓÇ║ should update thread with patient metadata on 
+ingestion
+
+    Nest can't resolve dependencies of the JanmasethuHandler (JanmasethuRepository, JanmasethuScopePolicy, ?, 
+SentimentService, RoutingService, EngagementEngineService, JanmasethuGuardrailService, EmergencyHotlineService). 
+Please make sure that the argument JanmasethuSlaWorker at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuSlaWorker is a provider, is it part of the current RootTestModule?
+    - If JanmasethuSlaWorker is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuSlaWorker */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 32 |[39m             providers[33m:[39m [
+     [90m 33 |[39m                 [33mJanmasethuHandler[39m[33m,[39m
+     [90m 34 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.handler.spec.ts:31:39)
+
+PASS src/kernel/ownership/ownership.service.spec.ts
+PASS src/domains/janmasethu/appointments/appointment.service.spec.ts
+FAIL src/domains/janmasethu/documents/document.service.spec.ts (6.704 s)
+  ΓùÅ DocumentService ΓÇ║ should queue a job securely if no document exists
+
+    TypeError: this.storageService.buildFilePath is not a function
+
+    [0m [90m 72 |[39m         [36mconst[39m idempotencyKey [33m=[39m 
+[32m`prescription_${dto.prescription_id}_v1`[39m[33m;[39m
+     [90m 73 |[39m         [36mconst[39m fileName [33m=[39m 
+[32m`prescription_${dto.prescription_id}.docx`[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 74 |[39m         [36mconst[39m filePath [33m=[39m 
+[36mthis[39m[33m.[39mstorageService[33m.[39mbuildFilePath(
+     [90m    |[39m                                              [31m[1m^[22m[39m
+     [90m 75 |[39m             dto[33m.[39mpatient_id[33m,[39m
+     [90m 76 |[39m             dto[33m.[39mconsultation_id[33m,[39m
+     [90m 77 |[39m             fileName[0m
+
+      at DocumentService.queuePrescriptionGeneration (domains/janmasethu/documents/document.service.ts:74:46)
+      at Object.<anonymous> (domains/janmasethu/documents/document.service.spec.ts:58:24)
+
+PASS src/kernel/sentiment/sentiment.service.spec.ts
+PASS src/domains/janmasethu/consent/consent.controller.spec.ts
+PASS src/domains/janmasethu/consent/consent-enforcement.service.spec.ts
+PASS src/domains/janmasethu/vitals/vitals.service.spec.ts
+PASS src/domains/janmasethu/clinical-intelligence/clinical-intelligence.service.spec.ts
+PASS src/domains/janmasethu/engagement-engine/engine.service.spec.ts
+PASS src/domains/janmasethu/vitals/vitals.controller.spec.ts
+PASS src/infrastructure/ai-suppression.guard.spec.ts
+PASS src/domains/janmasethu/janmasethu.rbac.spec.ts
+PASS src/domains/janmasethu/alerting/alerting.controller.spec.ts
+PASS src/kernel/thread/thread.service.spec.ts
+PASS src/domains/janmasethu/janmasethu.summary.service.spec.ts
+PASS src/domains/janmasethu/clinical-intelligence/clinical-intelligence.controller.spec.ts
+PASS src/domains/janmasethu/JanmasethuScopePolicy.spec.ts
+PASS src/kernel/guardrail/guardrail.service.spec.ts
+PASS src/domains/janmasethu/risk-engine/janmasethu-guardrails.spec.ts
+[95m[Nest] 22584  - [39m22/05/2026, 3:21:45 pm [95m  DEBUG[39m [38;5;3m[JanmasethuGuardrails] [39m[95mAI PAUSED: Waiting for patient to reply to the doctor's message.[39m
+[31m[Nest] 23640  - [39m22/05/2026, 3:21:45 pm [31m  ERROR[39m [38;5;3m[EmergencyHotlineService] [39m[31mΓ¥î 
+FAILED to trigger emergency hotline: Gateway Timeout[39m
+PASS src/domains/janmasethu/utils/emergency-hotline.service.spec.ts
+PASS src/domains/janmasethu/consent/consent.repository.spec.ts
+
+Summary of all failing tests
+FAIL domains/janmasethu/janmasethu.audit.service.spec.ts
+  ΓùÅ JanmasethuAuditService ΓÇ║ should log PII access for a patient
+
+    TypeError: Cannot read properties of undefined (reading 'append')
+
+    [0m [90m 28 |[39m         [36mthis[39m[33m.[39mlogger[33m.[39mwarn([32m`AUDIT: [${actorType}] ${actorId} 
+accessed PII for patient ${patientId}. Reason: ${reason}`[39m)[33m;[39m
+     [90m 29 |[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         [36mawait[39m [36mthis[39m[33m.[39mkernelAudit[33m.[39mappend({
+     [90m    |[39m                                [31m[1m^[22m[39m
+     [90m 31 |[39m             actor_id[33m:[39m actorId[33m,[39m
+     [90m 32 |[39m             actor_type[33m:[39m [32m'HUMAN'[39m[33m,[39m
+     [90m 33 |[39m             event_type[33m:[39m [32m'PII_ACCESS'[39m[33m,[39m[0m
+
+      at JanmasethuAuditService.logPIIAccess (domains/janmasethu/janmasethu.audit.service.ts:30:32)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.audit.service.spec.ts:17:23)
+
+  ΓùÅ JanmasethuAuditService ΓÇ║ should log a medical record update
+
+    TypeError: Cannot read properties of undefined (reading 'append')
+
+    [0m [90m 42 |[39m         [36mthis[39m[33m.[39mlogger[33m.[39mlog([32m`AUDIT: Clinical update for 
+patient ${patientId} by ${actorId}: ${action}`[39m)[33m;[39m
+     [90m 43 |[39m
+    [31m[1m>[22m[39m[90m 44 |[39m         [36mawait[39m [36mthis[39m[33m.[39mkernelAudit[33m.[39mappend({
+     [90m    |[39m                                [31m[1m^[22m[39m
+     [90m 45 |[39m             actor_id[33m:[39m actorId[33m,[39m
+     [90m 46 |[39m             actor_type[33m:[39m [32m'HUMAN'[39m[33m,[39m
+     [90m 47 |[39m             event_type[33m:[39m [32m'CLINICAL_UPDATE'[39m[33m,[39m[0m
+
+      at JanmasethuAuditService.logClinicalUpdate (domains/janmasethu/janmasethu.audit.service.ts:44:32)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.audit.service.spec.ts:27:23)
+
+  ΓùÅ JanmasethuAuditService ΓÇ║ should fetch the permanent audit ledger
+
+    TypeError: Cannot read properties of undefined (reading 'getAll')
+
+    [0m [90m 54 |[39m [90m     */[39m
+     [90m 55 |[39m     [36masync[39m getAuditHistory(limit[33m:[39m number [33m=[39m [35m100[39m) {
+    [31m[1m>[22m[39m[90m 56 |[39m         [36mreturn[39m 
+[36mthis[39m[33m.[39mkernelAudit[33m.[39mgetAll()[33m;[39m
+     [90m    |[39m                                 [31m[1m^[22m[39m
+     [90m 57 |[39m     }
+     [90m 58 |[39m }
+     [90m 59 |[39m[0m
+
+      at JanmasethuAuditService.getAuditHistory (domains/janmasethu/janmasethu.audit.service.ts:56:33)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.audit.service.spec.ts:37:23)
+
+FAIL domains/janmasethu/janmasethu.sla.spec.ts
+  ΓùÅ JanmasethuSlaWorker (Unit Test) ΓÇ║ Feature: SLA Scheduling ΓÇ║ should schedule a RED SLA with a 5-minute delay
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "check_sla", ObjectContaining {"category": "red", "threadId": "thread-1"}, ObjectContaining {"delay": 
+300000}
+    Received: "check_sla", {"category": "red", "role": "NURSE", "threadId": "thread-1"}, {"attempts": 3, "backoff": 
+{"delay": 10000, "type": "exponential"}, "delay": 180000, "jobId": "thread-1", "removeOnComplete": true}
+
+    Number of calls: 1
+
+    [0m [90m 49 |[39m             [36mawait[39m worker[33m.[39mscheduleSla([32m'thread-1'[39m[33m,[39m 
+[32m'red'[39m)[33m;[39m
+     [90m 50 |[39m
+    [31m[1m>[22m[39m[90m 51 |[39m             expect(mockQueue[33m.[39madd)[33m.[39mtoHaveBeenCalledWith(
+     [90m    |[39m                                   [31m[1m^[22m[39m
+     [90m 52 |[39m                 [32m'check_sla'[39m[33m,[39m
+     [90m 53 |[39m                 expect[33m.[39mobjectContaining({ threadId[33m:[39m 
+[32m'thread-1'[39m[33m,[39m category[33m:[39m [32m'red'[39m })[33m,[39m
+     [90m 54 |[39m                 expect[33m.[39mobjectContaining({ delay[33m:[39m [35m5[39m [33m*[39m 
+[35m60[39m [33m*[39m [35m1000[39m })[0m
+
+      at Object.<anonymous> (domains/janmasethu/janmasethu.sla.spec.ts:51:35)
+
+  ΓùÅ JanmasethuSlaWorker (Unit Test) ΓÇ║ Feature: SLA Scheduling ΓÇ║ should schedule a YELLOW SLA with a 30-minute 
+delay
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "check_sla", ObjectContaining {"category": "yellow", "threadId": "thread-1"}, ObjectContaining {"delay": 
+1800000}
+    Received: "check_sla", {"category": "yellow", "role": "NURSE", "threadId": "thread-1"}, {"attempts": 3, "backoff": 
+{"delay": 10000, "type": "exponential"}, "delay": 600000, "jobId": "thread-1", "removeOnComplete": true}
+
+    Number of calls: 1
+
+    [0m [90m 59 |[39m             [36mawait[39m worker[33m.[39mscheduleSla([32m'thread-1'[39m[33m,[39m 
+[32m'yellow'[39m)[33m;[39m
+     [90m 60 |[39m
+    [31m[1m>[22m[39m[90m 61 |[39m             expect(mockQueue[33m.[39madd)[33m.[39mtoHaveBeenCalledWith(
+     [90m    |[39m                                   [31m[1m^[22m[39m
+     [90m 62 |[39m                 [32m'check_sla'[39m[33m,[39m
+     [90m 63 |[39m                 expect[33m.[39mobjectContaining({ threadId[33m:[39m 
+[32m'thread-1'[39m[33m,[39m category[33m:[39m [32m'yellow'[39m })[33m,[39m
+     [90m 64 |[39m                 expect[33m.[39mobjectContaining({ delay[33m:[39m [35m30[39m [33m*[39m 
+[35m60[39m [33m*[39m [35m1000[39m })[0m
+
+      at Object.<anonymous> (domains/janmasethu/janmasethu.sla.spec.ts:61:35)
+
+  ΓùÅ JanmasethuSlaWorker (Unit Test) ΓÇ║ Feature: SLA Breach Detection ΓÇ║ should detect a breach and revert to 
+DOCTOR_QUEUE if thread is still RED and assigned
+
+    TypeError: this.repository.findLatestMessageByThread is not a function
+
+    [0m [90m 72 |[39m         [36mif[39m (isStillInRisk [33m&&[39m (isStillAssignedToSameRole [33m||[39m 
+isHumanLocked)) {
+     [90m 73 |[39m             [90m// Check if there was a recent human message after the SLA was scheduled[39m
+    [31m[1m>[22m[39m[90m 74 |[39m             [36mconst[39m lastMessage [33m=[39m [36mawait[39m 
+[36mthis[39m[33m.[39mrepository[33m.[39mfindLatestMessageByThread(threadId)[33m;[39m
+     [90m    |[39m                                                       [31m[1m^[22m[39m
+     [90m 75 |[39m             [36mif[39m (lastMessage [33m&&[39m 
+lastMessage[33m.[39mcreated_at[33m.[39mgetTime() [33m>[39m job[33m.[39mtimestamp) {
+     [90m 76 |[39m                 [36mthis[39m[33m.[39mlogger[33m.[39mlog([32m`SLA safe: Human responded to 
+${threadId} since scheduling.`[39m)[33m;[39m
+     [90m 77 |[39m                 [36mreturn[39m[33m;[39m[0m
+
+      at JanmasethuSlaWorker.process (domains/janmasethu/janmasethu.sla.ts:74:55)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.sla.spec.ts:81:13)
+
+FAIL domains/janmasethu/channel/janmasethu-dispatch.service.spec.ts
+  ΓùÅ JanmasethuDispatchService ΓÇ║ should be defined
+
+    Nest can't resolve dependencies of the JanmasethuDispatchService (ConfigService, ?, JanmasethuRepository). Please 
+make sure that the argument ConsentEnforcementService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ConsentEnforcementService is a provider, is it part of the current RootTestModule?
+    - If ConsentEnforcementService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ConsentEnforcementService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 20 |[39m
+     [90m 21 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 22 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 23 |[39m             providers[33m:[39m [
+     [90m 24 |[39m                 [33mJanmasethuDispatchService[39m[33m,[39m
+     [90m 25 |[39m                 { provide[33m:[39m [33mConfigService[39m[33m,[39m useValue[33m:[39m 
+mockConfigService }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/channel/janmasethu-dispatch.service.spec.ts:22:39)
+
+  ΓùÅ JanmasethuDispatchService ΓÇ║ should route to whatsapp successfully
+
+    Nest can't resolve dependencies of the JanmasethuDispatchService (ConfigService, ?, JanmasethuRepository). Please 
+make sure that the argument ConsentEnforcementService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ConsentEnforcementService is a provider, is it part of the current RootTestModule?
+    - If ConsentEnforcementService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ConsentEnforcementService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 20 |[39m
+     [90m 21 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 22 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 23 |[39m             providers[33m:[39m [
+     [90m 24 |[39m                 [33mJanmasethuDispatchService[39m[33m,[39m
+     [90m 25 |[39m                 { provide[33m:[39m [33mConfigService[39m[33m,[39m useValue[33m:[39m 
+mockConfigService }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/channel/janmasethu-dispatch.service.spec.ts:22:39)
+
+  ΓùÅ JanmasethuDispatchService ΓÇ║ should fallback to SMS automatically if whatsapp throws an error
+
+    Nest can't resolve dependencies of the JanmasethuDispatchService (ConfigService, ?, JanmasethuRepository). Please 
+make sure that the argument ConsentEnforcementService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ConsentEnforcementService is a provider, is it part of the current RootTestModule?
+    - If ConsentEnforcementService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ConsentEnforcementService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 20 |[39m
+     [90m 21 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 22 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 23 |[39m             providers[33m:[39m [
+     [90m 24 |[39m                 [33mJanmasethuDispatchService[39m[33m,[39m
+     [90m 25 |[39m                 { provide[33m:[39m [33mConfigService[39m[33m,[39m useValue[33m:[39m 
+mockConfigService }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/channel/janmasethu-dispatch.service.spec.ts:22:39)
+
+FAIL domains/janmasethu/notifications/notification.service.spec.ts
+  ΓùÅ NotificationService ΓÇ║ should send a dashboard alert and log it for clinicians
+
+    Nest can't resolve dependencies of the NotificationService (JanmasethuRepository, ?). Please make sure that the 
+argument JanmasethuDispatchService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 16 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 17 |[39m             providers[33m:[39m [
+     [90m 18 |[39m                 [33mNotificationService[39m[33m,[39m
+     [90m 19 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/notifications/notification.service.spec.ts:16:39)
+
+  ΓùÅ NotificationService ΓÇ║ should mock WhatsApp delivery and log it
+
+    Nest can't resolve dependencies of the NotificationService (JanmasethuRepository, ?). Please make sure that the 
+argument JanmasethuDispatchService at index [1] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 16 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 17 |[39m             providers[33m:[39m [
+     [90m 18 |[39m                 [33mNotificationService[39m[33m,[39m
+     [90m 19 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/notifications/notification.service.spec.ts:16:39)
+
+FAIL domains/janmasethu/analytics/analytics.service.spec.ts
+  ΓùÅ AnalyticsService ΓÇ║ should be defined
+
+    Nest can't resolve dependencies of the AnalyticsService (?). Please make sure that the argument "SUPABASE_CLIENT" 
+at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "SUPABASE_CLIENT" is a provider, is it part of the current RootTestModule?
+    - If "SUPABASE_CLIENT" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "SUPABASE_CLIENT" */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 28 |[39m             providers[33m:[39m [
+     [90m 29 |[39m                 [33mAnalyticsService[39m[33m,[39m
+     [90m 30 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepo }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/analytics/analytics.service.spec.ts:27:39)
+
+  ΓùÅ AnalyticsService ΓÇ║ should return cached metrics natively without DB sweep
+
+    Nest can't resolve dependencies of the AnalyticsService (?). Please make sure that the argument "SUPABASE_CLIENT" 
+at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "SUPABASE_CLIENT" is a provider, is it part of the current RootTestModule?
+    - If "SUPABASE_CLIENT" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "SUPABASE_CLIENT" */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 28 |[39m             providers[33m:[39m [
+     [90m 29 |[39m                 [33mAnalyticsService[39m[33m,[39m
+     [90m 30 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepo }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/analytics/analytics.service.spec.ts:27:39)
+
+  ΓùÅ AnalyticsService ΓÇ║ should calculate metrics when cache is empty
+
+    Nest can't resolve dependencies of the AnalyticsService (?). Please make sure that the argument "SUPABASE_CLIENT" 
+at index [0] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "SUPABASE_CLIENT" is a provider, is it part of the current RootTestModule?
+    - If "SUPABASE_CLIENT" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "SUPABASE_CLIENT" */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 28 |[39m             providers[33m:[39m [
+     [90m 29 |[39m                 [33mAnalyticsService[39m[33m,[39m
+     [90m 30 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepo }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 0)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/analytics/analytics.service.spec.ts:27:39)
+
+FAIL domains/janmasethu/janmasethu.leads.service.spec.ts
+  ΓùÅ JanmasethuLeadsService (Encryption & Funnel) ΓÇ║ should encrypt sensitive medical fields before saving to 
+database
+
+    Nest can't resolve dependencies of the JanmasethuLeadsService (JanmasethuRepository, JanmasethuEncryptionService, 
+?). Please make sure that the argument JanmasethuDispatchService at index [2] is available in the RootTestModule 
+context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 19 |[39m
+     [90m 20 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 21 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 22 |[39m             providers[33m:[39m [
+     [90m 23 |[39m                 [33mJanmasethuLeadsService[39m[33m,[39m
+     [90m 24 |[39m                 {[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.leads.service.spec.ts:21:39)
+
+  ΓùÅ JanmasethuLeadsService (Encryption & Funnel) ΓÇ║ should decrypt sensitive fields when fetching from dashboard
+
+    Nest can't resolve dependencies of the JanmasethuLeadsService (JanmasethuRepository, JanmasethuEncryptionService, 
+?). Please make sure that the argument JanmasethuDispatchService at index [2] is available in the RootTestModule 
+context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 19 |[39m
+     [90m 20 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 21 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 22 |[39m             providers[33m:[39m [
+     [90m 23 |[39m                 [33mJanmasethuLeadsService[39m[33m,[39m
+     [90m 24 |[39m                 {[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.leads.service.spec.ts:21:39)
+
+  ΓùÅ JanmasethuLeadsService (Encryption & Funnel) ΓÇ║ should identify and nudge stalled leads in the funnel
+
+    Nest can't resolve dependencies of the JanmasethuLeadsService (JanmasethuRepository, JanmasethuEncryptionService, 
+?). Please make sure that the argument JanmasethuDispatchService at index [2] is available in the RootTestModule 
+context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuDispatchService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuDispatchService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuDispatchService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 19 |[39m
+     [90m 20 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 21 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 22 |[39m             providers[33m:[39m [
+     [90m 23 |[39m                 [33mJanmasethuLeadsService[39m[33m,[39m
+     [90m 24 |[39m                 {[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.leads.service.spec.ts:21:39)
+
+FAIL domains/janmasethu/engagement/engagement.service.spec.ts (5.106 s)
+  ΓùÅ EngagementService ΓÇ║ should prevent scheduling staged messages if consent is denied
+
+    TypeError: this.supabase.from(...).select(...).eq(...).eq(...).ilike is not a function
+
+    [0m [90m 34 |[39m             [33m.[39meq([32m'journey_stage'[39m[33m,[39m stage)
+     [90m 35 |[39m             [33m.[39meq([32m'trigger_type'[39m[33m,[39m [32m'STAGED'[39m)
+    [31m[1m>[22m[39m[90m 36 |[39m             [33m.[39milike([32m'template_key'[39m[33m,[39m 
+[32m`%W${week}%`[39m)
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 37 |[39m             [33m.[39msingle()[33m;[39m
+     [90m 38 |[39m
+     [90m 39 |[39m         [36mif[39m (template) {[0m
+
+      at EngagementService.scheduleStagedMessage (domains/janmasethu/engagement/engagement.service.ts:36:14)
+      at Object.<anonymous> (domains/janmasethu/engagement/engagement.service.spec.ts:54:23)
+
+FAIL domains/janmasethu/janmasethu.dfo.service.spec.ts (5.225 s)
+  ΓùÅ JanmasethuDFOService ΓÇ║ should correctly register or update a patient
+
+    Nest can't resolve dependencies of the JanmasethuDFOService (JanmasethuRepository, EngagementService, ?). Please 
+make sure that the argument JanmasethuEncryptionService at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuEncryptionService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuEncryptionService is exported from a separate @Module, is that module imported within 
+RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuEncryptionService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 33 |[39m
+     [90m 34 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 35 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 36 |[39m             providers[33m:[39m [
+     [90m 37 |[39m                 [33mJanmasethuDFOService[39m[33m,[39m
+     [90m 38 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.dfo.service.spec.ts:35:39)
+
+  ΓùÅ JanmasethuDFOService ΓÇ║ should start a consultation for a valid patient
+
+    Nest can't resolve dependencies of the JanmasethuDFOService (JanmasethuRepository, EngagementService, ?). Please 
+make sure that the argument JanmasethuEncryptionService at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuEncryptionService is a provider, is it part of the current RootTestModule?
+    - If JanmasethuEncryptionService is exported from a separate @Module, is that module imported within 
+RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuEncryptionService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 33 |[39m
+     [90m 34 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 35 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 36 |[39m             providers[33m:[39m [
+     [90m 37 |[39m                 [33mJanmasethuDFOService[39m[33m,[39m
+     [90m 38 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.dfo.service.spec.ts:35:39)
+
+FAIL domains/janmasethu/janmasethu.handler.spec.ts (5.763 s)
+  ΓùÅ JanmasethuHandler (Unit Test) ΓÇ║ should be defined
+
+    Nest can't resolve dependencies of the JanmasethuHandler (JanmasethuRepository, JanmasethuScopePolicy, ?, 
+SentimentService, RoutingService, EngagementEngineService, JanmasethuGuardrailService, EmergencyHotlineService). 
+Please make sure that the argument JanmasethuSlaWorker at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuSlaWorker is a provider, is it part of the current RootTestModule?
+    - If JanmasethuSlaWorker is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuSlaWorker */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 32 |[39m             providers[33m:[39m [
+     [90m 33 |[39m                 [33mJanmasethuHandler[39m[33m,[39m
+     [90m 34 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.handler.spec.ts:31:39)
+
+  ΓùÅ JanmasethuHandler (Unit Test) ΓÇ║ Identity Resolution ΓÇ║ should auto-register a new patient if they do not exist
+
+    Nest can't resolve dependencies of the JanmasethuHandler (JanmasethuRepository, JanmasethuScopePolicy, ?, 
+SentimentService, RoutingService, EngagementEngineService, JanmasethuGuardrailService, EmergencyHotlineService). 
+Please make sure that the argument JanmasethuSlaWorker at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuSlaWorker is a provider, is it part of the current RootTestModule?
+    - If JanmasethuSlaWorker is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuSlaWorker */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 32 |[39m             providers[33m:[39m [
+     [90m 33 |[39m                 [33mJanmasethuHandler[39m[33m,[39m
+     [90m 34 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.handler.spec.ts:31:39)
+
+  ΓùÅ JanmasethuHandler (Unit Test) ΓÇ║ Idempotency ΓÇ║ should skip processing if message_id already exists
+
+    Nest can't resolve dependencies of the JanmasethuHandler (JanmasethuRepository, JanmasethuScopePolicy, ?, 
+SentimentService, RoutingService, EngagementEngineService, JanmasethuGuardrailService, EmergencyHotlineService). 
+Please make sure that the argument JanmasethuSlaWorker at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuSlaWorker is a provider, is it part of the current RootTestModule?
+    - If JanmasethuSlaWorker is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuSlaWorker */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 32 |[39m             providers[33m:[39m [
+     [90m 33 |[39m                 [33mJanmasethuHandler[39m[33m,[39m
+     [90m 34 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.handler.spec.ts:31:39)
+
+  ΓùÅ JanmasethuHandler (Unit Test) ΓÇ║ Thread Linkage & Metadata ΓÇ║ should update thread with patient metadata on 
+ingestion
+
+    Nest can't resolve dependencies of the JanmasethuHandler (JanmasethuRepository, JanmasethuScopePolicy, ?, 
+SentimentService, RoutingService, EngagementEngineService, JanmasethuGuardrailService, EmergencyHotlineService). 
+Please make sure that the argument JanmasethuSlaWorker at index [2] is available in the RootTestModule context.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If JanmasethuSlaWorker is a provider, is it part of the current RootTestModule?
+    - If JanmasethuSlaWorker is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing JanmasethuSlaWorker */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m         [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m 
+[36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 32 |[39m             providers[33m:[39m [
+     [90m 33 |[39m                 [33mJanmasethuHandler[39m[33m,[39m
+     [90m 34 |[39m                 { provide[33m:[39m [33mJanmasethuRepository[39m[33m,[39m 
+useValue[33m:[39m mockRepository }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 2)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders 
+(../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (domains/janmasethu/janmasethu.handler.spec.ts:31:39)
+
+FAIL domains/janmasethu/documents/document.service.spec.ts (6.704 s)
+  ΓùÅ DocumentService ΓÇ║ should queue a job securely if no document exists
+
+    TypeError: this.storageService.buildFilePath is not a function
+
+    [0m [90m 72 |[39m         [36mconst[39m idempotencyKey [33m=[39m 
+[32m`prescription_${dto.prescription_id}_v1`[39m[33m;[39m
+     [90m 73 |[39m         [36mconst[39m fileName [33m=[39m 
+[32m`prescription_${dto.prescription_id}.docx`[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 74 |[39m         [36mconst[39m filePath [33m=[39m 
+[36mthis[39m[33m.[39mstorageService[33m.[39mbuildFilePath(
+     [90m    |[39m                                              [31m[1m^[22m[39m
+     [90m 75 |[39m             dto[33m.[39mpatient_id[33m,[39m
+     [90m 76 |[39m             dto[33m.[39mconsultation_id[33m,[39m
+     [90m 77 |[39m             fileName[0m
+
+      at DocumentService.queuePrescriptionGeneration (domains/janmasethu/documents/document.service.ts:74:46)
+      at Object.<anonymous> (domains/janmasethu/documents/document.service.spec.ts:58:24)
+
+
+Test Suites: 10 failed, 21 passed, 31 total
+Tests:       25 failed, 101 passed, 126 total
+Snapshots:   0 total
+Time:        10.718 s, estimated 13 s
+Ran all test suites.

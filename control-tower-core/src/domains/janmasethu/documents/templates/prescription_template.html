@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Professional Prescription Template</title>
+    <style>
+        body { font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.4; padding: 0; margin: 0; }
+        .prescription-container { width: 595px; height: 842px; /* A4 size roughly */ padding: 40px; border: 1px solid #ddd; margin: 20px auto; background-color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0056b3; padding-bottom: 20px; }
+        .title { text-align: center; font-size: 20px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #0056b3; margin: 25px 0 15px 0; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .section-label { font-weight: bold; font-size: 14px; text-transform: uppercase; color: #6c757d; border-bottom: 1px solid #dee2e6; margin-top: 25px; margin-bottom: 10px; padding-bottom: 5px; }
+        table.medication-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        table.medication-table th { background-color: #0056b3; color: #fff; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #dee2e6; }
+        table.medication-table td { padding: 10px; border: 1px solid #dee2e6; vertical-align: top; }
+        .footer { margin-top: 50px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .signature { text-align: right; font-style: italic; color: #6c757d; }
+    </style>
+</head>
+<body>
+
+<div class="prescription-container">
+    <div class="header">
+        <div>
+            <strong style="color:#0056b3">JANMASETHU</strong><br>
+            <small>Digital Health Platform</small>
+        </div>
+        <div>
+            <strong style="color:#e91e63">Sakhi</strong>
+        </div>
+    </div>
+
+    <div class="title">PRESCRIPTION RECEIPT</div>
+
+    <div class="section-label">Patient Information</div>
+    <div class="info-grid">
+        <div>Patient Name: <strong>{{patient_name}}</strong></div>
+        <div>Date: {{appointment_date}}</div>
+        <div>Age / Gender: {{age}} / {{gender}}</div>
+        <div>Time: {{appointment_time}}</div>
+        <div>Patient ID: {{patient_id}}</div>
+    </div>
+
+    <div class="section-label">Medication Details</div>
+    <table class="medication-table">
+        <thead>
+            <tr>
+                <th>Medicine Name & Dosage</th>
+                <th>Frequency</th>
+                <th>Duration</th>
+                <th>Instructions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each medications}}
+            <tr>
+                <td><strong>{{this.name}}</strong><br>{{this.dosage}}</td>
+                <td>{{this.frequency}}</td>
+                <td>{{this.duration}}</td>
+                <td>{{this.instructions}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <div class="section-label">Notes</div>
+    <div style="font-size: 13px; color: #6c757d; margin-bottom: 20px;">
+        {{#if clinical_notes}}Clinical: {{clinical_notes}}<br>{{/if}}
+        {{#if additional_notes}}Additional: {{additional_notes}}{{/if}}
+    </div>
+
+    <div class="footer">
+        <div>
+            <small>Prescribing Doctor:</small><br>
+            <strong>{{doctor_name}}</strong>
+        </div>
+        <div class="signature">
+            <img src="{{doctor_signature_url}}" alt="Digital Signature" style="width: 120px; height: auto;"><br>
+            <strong>REG. NO: {{reg_no}}</strong>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

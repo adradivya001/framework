@@ -15,6 +15,8 @@ import { JanmasethuChannelService } from './channel/janmasethu-channel.service';
 import { JanmasethuDispatchService } from './channel/janmasethu-dispatch.service';
 import { JanmasethuChannelController } from './channel/janmasethu-channel.controller';
 import { RealtimeEventsController } from './api/realtime-events.controller';
+import { JanmasethuHealthController } from './api/health.controller';
+import { JanmasethuMaintenanceService } from './utils/maintenance.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { ProviderRegistry } from '../../kernel/services/provider-registry.service';
@@ -44,6 +46,7 @@ import { AlertingModule } from './alerting/alerting.module';
 import { AuthModule } from './auth/auth.module';
 import { ConsentModule } from './consent/consent.module';
 import { JanmasethuRepositoryModule } from './janmasethu-repository.module';
+import { SupportEngagementModule } from './support-engagement/support-engagement.module';
 
 @Module({
     imports: [
@@ -64,6 +67,7 @@ import { JanmasethuRepositoryModule } from './janmasethu-repository.module';
         AuthModule,
         ConsentModule,
         JanmasethuRepositoryModule,
+        SupportEngagementModule,
     ],
     providers: [
         JanmasethuHandler,
@@ -89,11 +93,13 @@ import { JanmasethuRepositoryModule } from './janmasethu-repository.module';
         JanmasethuEncryptionService,
         JanmasethuRbacService,
         EmergencyHotlineService,
+        JanmasethuMaintenanceService,
     ],
     controllers: [
         JanmasethuController,
         JanmasethuChannelController,
         RealtimeEventsController,
+        JanmasethuHealthController,
     ],
     exports: [
         JanmasethuHandler,
@@ -120,11 +126,15 @@ export class JanmasethuModule implements OnModuleInit {
         private readonly providerRegistry: ProviderRegistry,
         private readonly riskService: JanmasethuRiskService,
         private readonly escalationPolicy: JanmasethuPolicy,
+        private readonly maintenanceService: JanmasethuMaintenanceService,
         @InjectQueue('appointment_checker') private readonly checkerQueue: Queue,
     ) { }
 
-    onModuleInit() {
+    async onModuleInit() {
         this.logger.log(`Initializing Janmasethu Domain Module for PRODUCTION...`);
+
+        // 1. RUN BACKEND STABILIZATION (Health Checks, Queue Cleanup, Seeding)
+        await this.maintenanceService.stabilizeBackend();
 
         this.providerRegistry.register(JANMASETHU_DOMAIN, {
             sentimentProvider: this.riskService,

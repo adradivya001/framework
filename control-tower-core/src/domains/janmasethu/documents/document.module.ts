@@ -10,6 +10,8 @@ import { JanmasethuEncryptionService } from '../utils/encryption.service';
 import { JanmasethuRbacService } from '../janmasethu.rbac';
 import { JanmasethuAuditService } from '../janmasethu.audit.service';
 import { JanmasethuRepository } from '../janmasethu.repository';
+import { TemplateService } from './template.service';
+import { PdfService } from './pdf.service';
 
 @Module({
     imports: [
@@ -25,6 +27,8 @@ import { JanmasethuRepository } from '../janmasethu.repository';
         JanmasethuRbacService,
         JanmasethuAuditService,
         JanmasethuRepository,
+        TemplateService,
+        PdfService,
     ],
     controllers: [DocumentController],
     exports: [DocumentService],

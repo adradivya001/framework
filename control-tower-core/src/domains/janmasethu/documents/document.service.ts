@@ -11,6 +11,8 @@ import {
 } from './document.types';
 import { JanmasethuEncryptionService } from '../utils/encryption.service';
 import { UploadReportDto } from '../dto/dfo.dto';
+import { TemplateService } from './template.service';
+import { PdfService } from './pdf.service';
 
 const DOCUMENT_QUEUE = 'document_generation_queue';
 
@@ -35,6 +37,8 @@ export class DocumentService {
         private readonly storageService: DocumentStorageService,
         private readonly generator: DocumentGeneratorService,
         private readonly encryption: JanmasethuEncryptionService,
+        private readonly templateService: TemplateService,
+        private readonly pdfService: PdfService,
     ) { }
 
     // ============================================================
@@ -198,6 +202,79 @@ export class DocumentService {
             this.logger.error(`❌ Document generation failed: ${error.message}`);
             await this.documentRepo.markAsFailed(docRecord.id, error.message);
             throw error; // Re-throw so BullMQ retries the job
+        }
+    }
+
+    /**
+     * NEW: Generates a PDF using HTML Templates (Handlebars + Puppeteer)
+     * This follows the user's requested Step 3 & 4.
+     */
+    async executePdfGeneration(payload: GenerateDocumentJobPayload): Promise<void> {
+        const { prescription_id, consultation_id, patient_id, doctor_id } = payload;
+
+        const docRecord = await this.documentRepo.findByPrescriptionId(prescription_id);
+        if (!docRecord) throw new Error(`Pulse: No pending record for ${prescription_id}`);
+
+        try {
+            // 1. Fetch & Decrypt (Same as DOCX flow)
+            const [patient, consultation, prescription, doctor] = await Promise.all([
+                this.fetchPatient(patient_id),
+                this.fetchConsultation(consultation_id),
+                this.fetchPrescription(prescription_id),
+                this.fetchDoctor(doctor_id),
+            ]);
+
+            const patientName = this.encryption.decrypt(patient.full_name);
+
+            // 2. Prepare Template Data (Matches the {{placeholders}} in the HTML)
+            const templateData = {
+                patient_name: patientName,
+                appointment_date: new Date(consultation.start_time).toLocaleDateString(),
+                appointment_time: new Date(consultation.start_time).toLocaleTimeString(),
+                age: patient.age || 'N/A',
+                gender: patient.gender || 'N/A',
+                patient_id: patient.id.substring(0, 8).toUpperCase(),
+                clinical_notes: consultation.clinical_notes,
+                additional_notes: prescription.special_instructions,
+                doctor_name: doctor.full_name,
+                reg_no: doctor.registration_number || 'REG-99210-A',
+                doctor_signature_url: doctor.signature_url || 'https://via.placeholder.com/150x50?text=Digital+Signature',
+                medications: [
+                    {
+                        name: prescription.medication_name,
+                        dosage: prescription.dosage,
+                        frequency: prescription.frequency,
+                        duration: `${prescription.duration_days} Days`,
+                        instructions: prescription.special_instructions
+                    }
+                ]
+            };
+
+            // 3. Render HTML using Handlebars (Step 2 & 3)
+            const html = await this.templateService.renderTemplate('prescription_template', templateData);
+
+            // 4. Convert HTML to PDF using Puppeteer (Step 4)
+            const pdfBuffer = await this.pdfService.generatePdf(html);
+
+            // 5. Upload to Supabase (Bucket: document)
+            const pdfPath = docRecord.file_path.replace('.docx', '.pdf');
+            const { size } = await this.storageService.upload(pdfPath, pdfBuffer, 'application/pdf');
+
+            // 6. Update Registry
+            await this.documentRepo.markAsGenerated(docRecord.id, size);
+
+            // Optionally update the file path in DB if we switched from .docx to .pdf
+            await this.supabase.from('dfo_documents').update({
+                file_path: pdfPath,
+                file_name: docRecord.file_name.replace('.docx', '.pdf')
+            }).eq('id', docRecord.id);
+
+            this.logger.log(`✅ PDF Generation Successful: ${pdfPath}`);
+
+        } catch (error) {
+            this.logger.error(`❌ PDF Generation Failed: ${error.message}`);
+            await this.documentRepo.markAsFailed(docRecord.id, error.message);
+            throw error;
         }
     }
 
